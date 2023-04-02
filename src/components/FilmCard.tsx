@@ -10,12 +10,12 @@ const FilmCard = (film: FilmCard) => {
 
 
     React.useEffect(() => {
-        getGenres()
+        getGenre()
         getHeroImage()
         getDirectorImage()
     })
 
-    const getGenres = () => {
+    const getGenre = () => {
         axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/genres')
             .then((response) => {
                 setGenre(response.data.filter((g: Genre) => g.genreId === film.genreId)[0]);
@@ -45,9 +45,12 @@ const FilmCard = (film: FilmCard) => {
 
 
     return (
-        <a href={'/films/' + film.filmId} className="card d-flex w-25 overflow-hidden text-decoration-none text-dark">
-            <img className="card-img-top img-thumbnail img-fluid" src={`data:${heroImage.type};base64,${heroImage.data}`} alt="Hero" />
-            <div className="card-body d-flex flex-column">
+        <a href={'/films/' + film.filmId} className="card d-flex w-50 flex-column flex-md-row overflow-hidden text-decoration-none text-dark m-1">
+            <div className="col-md-6 img-thumbnail overflow-hidden d-flex align-items-center justify-content-center">
+                <img className="h-100" style={{ minWidth: '100%' }} src={`data:${heroImage.type};base64,${heroImage.data}`} alt="Hero" />
+            </div>
+
+            <div className="card-body d-flex flex-column justify-content-around">
                 <h5 className="card-title display">{film.title}</h5>
 
                 <div className="d-flex flex-row justify-content-around">
@@ -76,8 +79,8 @@ const FilmCard = (film: FilmCard) => {
                     </div>
                 </div>
                 <hr />
-                <div className="d-flex flex-row align-items-center justify-content-around mt-auto mb-auto">
-                    <div className="ratio ratio-1x1 rounded-circle border overflow-hidden" style={{ width: '20%' }}>
+                <div className="d-flex flex-row align-items-center justify-content-around">
+                    <div className="ratio ratio-1x1 rounded-circle border overflow-hidden" style={{ minWidth: '20%', maxWidth: '20%' }}>
                         <img className="object-fit-cover mx-auto" src={`data:${directorImage.type};base64,${directorImage.data}`} alt="Director Icon" />
                     </div>
                     <p className="mb-0">{film.directorFirstName}</p>
@@ -85,31 +88,8 @@ const FilmCard = (film: FilmCard) => {
                 </div>
 
             </div>
+
         </a >
-
-
-
-
-
-
-
-        // <div className="d-flex flex-column w-25 overflow-hidden border">
-        //     <div className="">
-        //         <img className="w-50" src="https://seng365.csse.canterbury.ac.nz/api/v1/films/1/image" alt="" />
-        //         <p>Title</p>
-        //     </div>
-        //     <div className="d-flex flex-row ">
-        //         <img className="w-25" src="https://seng365.csse.canterbury.ac.nz/api/v1/users/1/image" alt="" />
-        //         <p>First Name</p>
-        //         <p>Last Name</p>
-        //     </div>
-        //     <div>
-        //         <p>PG</p>
-        //         <p>6.33</p>
-        //         <p>Release Date</p>
-        //         <p>Action</p>
-        //     </div>
-        // </div>
     )
 }
 
