@@ -2,7 +2,7 @@ const Footer = () => {
 
     return (
         <div>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-bottom">
+            <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-bottom">
                 <div className="container">
                     <ul className="navbar-nav w-100 mt-2 mt-lg-0 d-flex justify-content-md-between">
                         <li className="nav-item">

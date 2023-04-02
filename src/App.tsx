@@ -9,7 +9,7 @@ function App() {
     <div className="App">
       <Main>
         <Router>
-          <div>
+          <div style={{ minHeight: '85vh' }}>
             <Routes>
               <Route path="/component/test" element={<FilmCard title={"Test"} filmId={1} genreId={1} directorId={4} directorFirstName={'FName'} directorLastName={'LName'} releaseDate={'12-07-2002'} ageRating={'PG'} rating={6.33} />} />
               <Route path="*" element={<NotFound />} />
