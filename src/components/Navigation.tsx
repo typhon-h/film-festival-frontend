@@ -1,7 +1,7 @@
 const Navigation = () => {
     return (
         <div>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+            <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
                 <div className="container">
                     <a className="navbar-brand" href="/">Film Festival</a>
                     <button className="navbar-toggler hidden-lg-up" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId"
