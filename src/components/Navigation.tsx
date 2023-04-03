@@ -1,4 +1,8 @@
+import { useLocation } from "react-router-dom";
+
 const Navigation = () => {
+    const location = useLocation();
+
     return (
         <div>
             <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
@@ -9,7 +13,10 @@ const Navigation = () => {
                     <div className="collapse navbar-collapse" id="collapsibleNavId">
                         <ul className="navbar-nav me-auto mt-2 mt-lg-0">
                             <li className="nav-item">
-                                <a className="nav-link active" href="/" aria-current="page">Home</a>
+                                <a className={'nav-link ' + (location.pathname === '/' ? 'active' : '')} href="/" aria-current="page">Home</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className={'nav-link ' + (location.pathname === '/films' ? 'active' : '')} href="/films" aria-current="page">Films</a>
                             </li>
                         </ul>
                     </div>

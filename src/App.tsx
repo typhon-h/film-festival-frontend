@@ -7,8 +7,8 @@ import ViewFilms from './pages/ViewFilms';
 function App() {
   return (
     <div className="App">
-      <Main>
-        <Router>
+      <Router>
+        <Main>
           <div style={{ minHeight: '85vh' }}>
             <Routes>
               <Route path="/films" element={<ViewFilms />}></Route>
@@ -16,9 +16,9 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
-        </Router>
-      </Main>
-    </div>
+        </Main>
+      </Router>
+    </div >
   );
 }
 export default App;
