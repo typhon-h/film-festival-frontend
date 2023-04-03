@@ -2,7 +2,7 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Main from './layouts/Main';
-import FilmCard from './components/FilmCard';
+import ViewFilms from './pages/ViewFilms';
 
 function App() {
   return (
@@ -11,7 +11,8 @@ function App() {
         <Router>
           <div style={{ minHeight: '85vh' }}>
             <Routes>
-              <Route path="/component/test" element={<FilmCard title={"Test"} filmId={1} genreId={1} directorId={4} directorFirstName={'FName'} directorLastName={'LName'} releaseDate={'12-07-2002'} ageRating={'PG'} rating={6.33} />} />
+              <Route path="/films" element={<ViewFilms />}></Route>
+              <Route path="/component/test" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
