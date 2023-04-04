@@ -50,8 +50,8 @@ const FilmCard = (props: any) => {
                     setDirectorImage(`data: ${response.headers['content-type']}; base64, ${Buffer.from(response.data, 'binary').toString('base64')}`);
                     setDirectorImageLoaded(true)
                 }, (error) => {
-                    setHeroImage(default_profile_picture);
-                    setHeroImageLoaded(true);
+                    setDirectorImage(default_profile_picture);
+                    setDirectorImageLoaded(true);
                 })
         }
 
