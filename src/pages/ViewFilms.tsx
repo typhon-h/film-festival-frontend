@@ -2,11 +2,13 @@ import React from "react";
 import FilmCard from "../components/FilmCard";
 import axios from "axios";
 import Cards from "../layouts/Cards";
+import FilmCardPlaceholder from "../components/placeholder/FilmCardPlaceholder";
 
 const ViewFilms = () => {
 
     const [films, setFilms] = React.useState<Array<Film>>([])
     const [errorFlag, setErrorFlag] = React.useState(false)
+    const [loading, setLoading] = React.useState(true)
 
     React.useEffect(() => {
         getFilms()
@@ -17,6 +19,7 @@ const ViewFilms = () => {
             .then((response) => {
                 setErrorFlag(false)
                 setFilms(response.data.films)
+                setLoading(false)
             }, (error) => {
                 setErrorFlag(true)
             })
@@ -29,9 +32,13 @@ const ViewFilms = () => {
         )
     }
 
-    if (errorFlag) {
+    if (loading) {
         return (
-            <h1>ERROR</h1>
+            <Cards>
+                <FilmCardPlaceholder />
+                <FilmCardPlaceholder />
+                <FilmCardPlaceholder />
+            </Cards>
         )
     }
     else {
