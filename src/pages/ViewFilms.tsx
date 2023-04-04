@@ -11,18 +11,29 @@ const ViewFilms = () => {
     const [errorMessage, setErrorMessage] = React.useState("")
     const [loading, setLoading] = React.useState(true)
     const [timedOut, setTimedOut] = React.useState(false)
-
+    const [isOnline, setIsOnline] = React.useState(navigator.onLine)
 
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
             setTimedOut(true)
-        }, 3000)
+        }, 1500)
+
+        const handleStatusChange = () => {
+            setIsOnline(navigator.onLine);
+        };
+
+        window.addEventListener("online", handleStatusChange)
+        window.addEventListener("offline", handleStatusChange)
 
         getFilms()
 
-        return () => clearTimeout(timer)
-    }, [])
+        return () => {
+            clearTimeout(timer)
+            window.removeEventListener('online', handleStatusChange);
+            window.removeEventListener('offline', handleStatusChange);
+        }
+    }, [isOnline])
 
     const getFilms = () => {
         axios.get(process.env.REACT_APP_DOMAIN + "/films")
@@ -32,10 +43,10 @@ const ViewFilms = () => {
                 setLoading(false)
             }, (error) => {
                 console.log(error)
-                setErrorFlag(true)
-                setErrorMessage(error.message)
-                if (error.code === "ERR_NETWORK") {
-                    setTimedOut(true)
+
+                if (error.code !== "ERR_NETWORK") {
+                    setErrorFlag(true)
+                    setErrorMessage(error.message)
                 }
             })
     }
