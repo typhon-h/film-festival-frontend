@@ -1,6 +1,6 @@
 const Cards = ({ children }: any) => {
     return (
-        <div className="d-flex flex-row flex-wrap justify-content-center justify-content-md-between px-5">
+        <div className="d-flex flex-row flex-wrap justify-content-center justify-content-sm-between px-5">
             {children}
         </div>
     )
