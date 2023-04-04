@@ -7,7 +7,9 @@ const FilmCard = (props: any) => {
     const [genre, setGenre] = React.useState<Genre>({ genreId: 0, name: "Unknown" });
     const [heroImage, setHeroImage] = React.useState<Image>({ data: "", type: "" });
     const [directorImage, setDirectorImage] = React.useState<Image>({ data: "", type: "" });
-
+    const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
+    const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
+    const [directorImageLoaded, setDirectorImageLoaded] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         getGenre()
@@ -19,6 +21,7 @@ const FilmCard = (props: any) => {
         axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/genres')
             .then((response) => {
                 setGenre(response.data.filter((g: Genre) => g.genreId === props.film.genreId)[0]);
+                setGenreLoaded(true)
             }, (error) => {
                 // Genre has default value from useState
             })
@@ -28,6 +31,7 @@ const FilmCard = (props: any) => {
         axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/' + props.film.filmId + '/image', { responseType: "arraybuffer" })
             .then((response) => {
                 setHeroImage({ data: Buffer.from(response.data, 'binary').toString('base64'), type: response.headers['content-type'] });
+                setHeroImageLoaded(true)
             }, (error) => {
                 // Image not found
             })
@@ -37,20 +41,19 @@ const FilmCard = (props: any) => {
         axios.get((process.env.REACT_APP_DOMAIN as string) + '/users/' + props.film.directorId + '/image', { responseType: "arraybuffer" })
             .then((response) => {
                 setDirectorImage({ data: Buffer.from(response.data, 'binary').toString('base64'), type: response.headers['content-type'] });
+                setDirectorImageLoaded(true)
             }, (error) => {
                 // Image not found
             })
     }
 
-
-
     return (
-        <a href={'/films/' + props.film.filmId} className="card d-flex flex-column flex-lg-row align-items-center overflow-hidden text-decoration-none text-dark mb-3" style={{ maxWidth: '24rem' }}>
-            <div className="w-75 img-thumbnail overflow-hidden d-flex align-items-center m-2">
-                <img className="h-100 object-fit-cover" style={{ minWidth: '100%' }} src={`data:${heroImage.type};base64,${heroImage.data}`} alt="Hero" />
+        <a href={'/films/' + props.film.filmId} className={'card d-flex flex-column flex-lg-row justify-content-center align-items-lg-center text-decoration-none text-dark mb-3 col-12 col-sm-5 col-md-4 col-lg-6 col-xl-4 ' + (heroImageLoaded ? '' : 'placeholder-glow')}>
+            <div className={'h-50 col-lg-4 col-xl-4 img-thumbnail ' + (heroImageLoaded ? '' : 'placeholder')} >
+                <img className={'w-100 h-100 ' + (heroImageLoaded ? '' : 'invisible')} src={`data:${heroImage.type};base64,${heroImage.data}`} alt="Hero" style={{ boxSizing: 'border-box' }} />
             </div>
 
-            <div className="card-body col-lg d-flex flex-column justify-content-around">
+            <div className="card-body d-flex flex-column justify-content-around col-lg-7 col-xl-3">
                 <h5 className="card-title display">{props.film.title}</h5>
 
                 <div className="d-flex flex-column flex-md-row justify-content-around p-2">
@@ -69,7 +72,7 @@ const FilmCard = (props: any) => {
                     <div className="d-flex flex-column">
                         <div className="mb-3">
                             <p className="card-text mb-1 fw-bold">Genre</p>
-                            <p className="card-text">{genre.name}</p>
+                            <p className={'card-text ' + (genreLoaded ? '' : 'placeholder-glow placeholder')}>{genre.name}</p>
                         </div>
 
                         <div>
@@ -79,9 +82,9 @@ const FilmCard = (props: any) => {
                     </div>
                 </div>
                 <hr />
-                <div className="d-flex flex-row align-items-center justify-content-around">
-                    <div className="ratio ratio-1x1 rounded-circle border overflow-hidden" style={{ minWidth: '20%', maxWidth: '20%' }}>
-                        <img className="object-fit-cover mx-auto" src={`data:${directorImage.type};base64,${directorImage.data}`} alt="Director Icon" />
+                <div className={'d-flex flex-row align-items-center justify-content-around ' + (directorImageLoaded ? '' : 'placeholder-glow')}>
+                    <div className={'ratio ratio-1x1 rounded-circle border overflow-hidden ' + (directorImageLoaded ? '' : 'placeholder')} style={{ minWidth: '20%', maxWidth: '20%' }}>
+                        <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={`data:${directorImage.type};base64,${directorImage.data}`} alt="Director Icon" style={{ objectFit: 'cover' }} />
                     </div>
                     <p className="mb-0">{props.film.directorFirstName}</p>
                     <p className="mb-0">{props.film.directorLastName}</p>
@@ -91,6 +94,7 @@ const FilmCard = (props: any) => {
 
         </a >
     )
+
 }
 
-export default FilmCard
+export default FilmCard;
