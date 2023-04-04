@@ -1,56 +1,68 @@
 import axios from "axios";
 import React from "react";
 import { Buffer } from "buffer";
+import default_profile_picture from "../assets/default_profile_picture.png";
+import default_film_picture from "../assets/default_film_picture.png";
 
 const FilmCard = (props: any) => {
 
     const [genre, setGenre] = React.useState<Genre>({ genreId: 0, name: "Unknown" });
-    const [heroImage, setHeroImage] = React.useState<Image>({ data: "", type: "" });
-    const [directorImage, setDirectorImage] = React.useState<Image>({ data: "", type: "" });
+    const [heroImage, setHeroImage] = React.useState<string>("");
+    const [directorImage, setDirectorImage] = React.useState<string>("");
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
     const [directorImageLoaded, setDirectorImageLoaded] = React.useState<boolean>(false);
 
     React.useEffect(() => {
+        const getGenre = () => {
+            axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/genres')
+                .then((response) => {
+                    setGenre(response.data.filter((g: Genre) => g.genreId === props.film.genreId)[0]);
+                    setGenreLoaded(true)
+                }, (error) => {
+                    console.log(error)
+                    // Genre has default value from useState
+                })
+        }
+
         getGenre()
+    }, [props.film.genreId])
+
+    React.useEffect(() => {
+        const getHeroImage = () => {
+            axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/' + props.film.filmId + '/image', { responseType: "arraybuffer" })
+                .then((response) => {
+                    setHeroImage(`data: ${response.headers['content-type']}; base64, ${Buffer.from(response.data, 'binary').toString('base64')}`);
+                    setHeroImageLoaded(true)
+                }, (error) => {
+                    setHeroImage(default_film_picture);
+                    setHeroImageLoaded(true);
+                })
+        }
+
         getHeroImage()
+    }, [props.film.filmId])
+
+    React.useEffect(() => {
+        const getDirectorImage = () => {
+            axios.get((process.env.REACT_APP_DOMAIN as string) + '/users/' + props.film.directorId + '/image', { responseType: "arraybuffer" })
+                .then((response) => {
+                    setDirectorImage(`data: ${response.headers['content-type']}; base64, ${Buffer.from(response.data, 'binary').toString('base64')}`);
+                    setDirectorImageLoaded(true)
+                }, (error) => {
+                    setHeroImage(default_profile_picture);
+                    setHeroImageLoaded(true);
+                })
+        }
+
         getDirectorImage()
-    })
+    }, [props.film.directorId])
 
-    const getGenre = () => {
-        axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/genres')
-            .then((response) => {
-                setGenre(response.data.filter((g: Genre) => g.genreId === props.film.genreId)[0]);
-                setGenreLoaded(true)
-            }, (error) => {
-                // Genre has default value from useState
-            })
-    }
-
-    const getHeroImage = () => {
-        axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/' + props.film.filmId + '/image', { responseType: "arraybuffer" })
-            .then((response) => {
-                setHeroImage({ data: Buffer.from(response.data, 'binary').toString('base64'), type: response.headers['content-type'] });
-                setHeroImageLoaded(true)
-            }, (error) => {
-                // Image not found
-            })
-    }
-
-    const getDirectorImage = () => {
-        axios.get((process.env.REACT_APP_DOMAIN as string) + '/users/' + props.film.directorId + '/image', { responseType: "arraybuffer" })
-            .then((response) => {
-                setDirectorImage({ data: Buffer.from(response.data, 'binary').toString('base64'), type: response.headers['content-type'] });
-                setDirectorImageLoaded(true)
-            }, (error) => {
-                // Image not found
-            })
-    }
 
     return (
         <a href={'/films/' + props.film.filmId} className={'card d-flex flex-column flex-lg-row justify-content-center align-items-lg-center text-decoration-none text-dark mb-3 col-12 col-sm-5 col-md-4 col-lg-6 col-xl-4 ' + (heroImageLoaded ? '' : 'placeholder-glow')}>
             <div className={'h-50 col-lg-4 col-xl-4 img-thumbnail ' + (heroImageLoaded ? '' : 'placeholder')} >
-                <img className={'w-100 h-100 ' + (heroImageLoaded ? '' : 'invisible')} src={(heroImageLoaded ? `data:${heroImage.type};base64,${heroImage.data}` : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Hero" style={{ boxSizing: 'border-box' }} />
+                <img className={'w-100 h-100 ' + (heroImageLoaded ? '' : 'invisible')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Hero" style={{ boxSizing: 'border-box' }} />
             </div>
 
             <div className="card-body d-flex flex-column justify-content-around col-lg-7 col-xl-3">
@@ -72,7 +84,7 @@ const FilmCard = (props: any) => {
                     <div className="d-flex flex-column">
                         <div className="mb-3 placeholder-glow ">
                             <p className="card-text mb-1 fw-bold">Genre</p>
-                            <p className={'card-text ' + (genreLoaded ? '' : 'placeholder')}>{genre.name}</p>
+                            <p className={'card-text ' + (genreLoaded ? '' : 'placeholder col-10')}>{genre.name}</p>
                         </div>
 
                         <div>
@@ -84,7 +96,7 @@ const FilmCard = (props: any) => {
                 <hr />
                 <div className={'d-flex flex-row align-items-center justify-content-around ' + (directorImageLoaded ? '' : 'placeholder-glow')}>
                     <div className={'ratio ratio-1x1 rounded-circle border overflow-hidden ' + (directorImageLoaded ? '' : 'placeholder')} style={{ minWidth: '20%', maxWidth: '20%' }}>
-                        <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={`data:${directorImage.type};base64,${directorImage.data}`} alt="Director Icon" style={{ objectFit: 'cover' }} />
+                        <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={directorImage} alt="Director Icon" style={{ objectFit: 'cover' }} />
                     </div>
                     <p className="mb-0">{props.film.directorFirstName}</p>
                     <p className="mb-0">{props.film.directorLastName}</p>
