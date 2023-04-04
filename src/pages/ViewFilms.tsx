@@ -32,6 +32,15 @@ const ViewFilms = () => {
         )
     }
 
+    const info_no_films = () => {
+        return (
+            <div className="alert alert-info" role="alert">
+                No films currently exist. Go <a href="/films/create" className="alert-link">here</a> to add a film you have directed.
+            </div>
+        )
+    }
+
+
     if (loading) {
         return (
             <Cards>
@@ -43,9 +52,12 @@ const ViewFilms = () => {
     }
     else {
         return (
-            <Cards>
-                {list_of_films()}
-            </Cards>
+            <div className="d-flex flex-column">
+                {(films.length === 0) ? info_no_films() : ''}
+                <Cards>
+                    {list_of_films()}
+                </Cards>
+            </div>
         )
     }
 }
