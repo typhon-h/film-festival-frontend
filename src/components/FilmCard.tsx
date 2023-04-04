@@ -50,7 +50,7 @@ const FilmCard = (props: any) => {
     return (
         <a href={'/films/' + props.film.filmId} className={'card d-flex flex-column flex-lg-row justify-content-center align-items-lg-center text-decoration-none text-dark mb-3 col-12 col-sm-5 col-md-4 col-lg-6 col-xl-4 ' + (heroImageLoaded ? '' : 'placeholder-glow')}>
             <div className={'h-50 col-lg-4 col-xl-4 img-thumbnail ' + (heroImageLoaded ? '' : 'placeholder')} >
-                <img className={'w-100 h-100 ' + (heroImageLoaded ? '' : 'invisible')} src={`data:${heroImage.type};base64,${heroImage.data}`} alt="Hero" style={{ boxSizing: 'border-box' }} />
+                <img className={'w-100 h-100 ' + (heroImageLoaded ? '' : 'invisible')} src={(heroImageLoaded ? `data:${heroImage.type};base64,${heroImage.data}` : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Hero" style={{ boxSizing: 'border-box' }} />
             </div>
 
             <div className="card-body d-flex flex-column justify-content-around col-lg-7 col-xl-3">
@@ -70,9 +70,9 @@ const FilmCard = (props: any) => {
                     </div>
 
                     <div className="d-flex flex-column">
-                        <div className="mb-3">
+                        <div className="mb-3 placeholder-glow ">
                             <p className="card-text mb-1 fw-bold">Genre</p>
-                            <p className={'card-text ' + (genreLoaded ? '' : 'placeholder-glow placeholder')}>{genre.name}</p>
+                            <p className={'card-text ' + (genreLoaded ? '' : 'placeholder')}>{genre.name}</p>
                         </div>
 
                         <div>

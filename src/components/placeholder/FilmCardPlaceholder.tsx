@@ -3,7 +3,7 @@ const FilmCardPlaceholder = () => {
     return (
         <div className={'card d-flex flex-column flex-lg-row justify-content-center align-items-lg-center text-decoration-none text-dark mb-3 col-12 col-sm-5 col-md-4 col-lg-6 col-xl-4 placeholder-glow'}>
             <div className="h-50 col-lg-4 col-xl-4 img-thumbnail placeholder" >
-                <img className={'w-100 h-100 invisible'} src={`data:text/png;Placeholder`} alt="Hero" style={{ boxSizing: 'border-box' }} />
+                <img className={'w-100 h-100 invisible'} src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=" alt="Hero" style={{ boxSizing: 'border-box' }} />
             </div>
 
             <div className="card-body d-flex flex-column justify-content-around col-lg-7 col-xl-3">
