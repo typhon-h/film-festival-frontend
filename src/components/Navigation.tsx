@@ -21,7 +21,7 @@ const Navigation = () => {
                         </ul>
 
                         <form action="/films" className="d-flex flex-column flex-lg-row form-inline my-2 my-lg-0">
-                            <input name="q" className="form-control mb-1 mb-lg-0 me-lg-1" type="search" placeholder="Search Film" aria-label="Search" />
+                            <input name="q" className="form-control mb-1 mb-lg-0 me-lg-1" type="search" placeholder="Search Film" aria-label="Search" maxLength={64} />
                             <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                         </form>
                     </div>
