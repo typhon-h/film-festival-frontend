@@ -20,8 +20,8 @@ const Navigation = () => {
                             </li>
                         </ul>
 
-                        <form className="d-flex flex-column flex-lg-row form-inline my-2 my-lg-0">
-                            <input className="form-control mb-1 mb-lg-0 me-lg-1" type="search" placeholder="Search Film" aria-label="Search" />
+                        <form action="/films" className="d-flex flex-column flex-lg-row form-inline my-2 my-lg-0">
+                            <input name="q" className="form-control mb-1 mb-lg-0 me-lg-1" type="search" placeholder="Search Film" aria-label="Search" />
                             <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                         </form>
                     </div>
