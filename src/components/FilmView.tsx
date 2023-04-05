@@ -13,6 +13,7 @@ const FilmView = (props: any) => {
     const [errorMessage, setErrorMessage] = React.useState("")
     const [loading, setLoading] = React.useState(true)
     const [timedOut, setTimedOut] = React.useState(false)
+    const [isSearch, setIsSearch] = React.useState(false)
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
@@ -22,7 +23,9 @@ const FilmView = (props: any) => {
         const buildQuery = () => {
             let query = ""
 
-            query += (searchParams.get('q')) ? `&q=${searchParams.get('q')}` : ''
+            setIsSearch((searchParams.get('q')) ? true : false)
+            query += (isSearch) ? `&q=${searchParams.get('q')}` : ''
+
             console.log(query)
             return query
         }
@@ -40,13 +43,17 @@ const FilmView = (props: any) => {
 
                     if (error.code !== "ERR_NETWORK") {
                         setErrorFlag(true)
-                        setErrorMessage(error.message)
+                        setErrorMessage(error.response.statusText)
                     }
+
+                    clearTimeout(timer)
+                    setTimedOut(false)
+
                 })
         }
 
         getFilms()
-    }, [searchParams])
+    }, [props.placeholder, isSearch, searchParams])
 
     const list_of_films = () => {
         return films.map((film: Film) =>
@@ -73,7 +80,24 @@ const FilmView = (props: any) => {
     const error_unexpected = () => {
         return (
             <div className="alert alert-danger" role="alert">
-                An unexpected error has occurred: {errorMessage}
+                {errorMessage}
+            </div>
+        )
+    }
+
+    const search_title = () => {
+        return (
+            <div className="my-2">
+                <h1 className="text-muted">Showing Results For:</h1>
+                <h3 className={(films.length === 0) ? "text-danger" : "text-success"}>{searchParams.get('q')}</h3>
+            </div>
+        )
+    }
+
+    const default_title = () => {
+        return (
+            <div className="my-2">
+                <h1 className="text-muted">All Films</h1>
             </div>
         )
     }
@@ -109,11 +133,12 @@ const FilmView = (props: any) => {
     }
 
     if (props.placeholder || loading) {
+        console.log(loading)
         return (
             <div className="d-flex flex-column">
                 {(timedOut) ? error_timed_out() : ''}
                 {(errorFlag) ? error_unexpected() : ''}
-
+                {default_title()}
                 {placeholder()}
             </div>
         )
@@ -124,6 +149,8 @@ const FilmView = (props: any) => {
             {(films.length === 0) ? info_no_films() : ''}
             {(timedOut) ? error_timed_out() : ''}
             {(errorFlag) ? error_unexpected() : ''}
+
+            {(isSearch) ? search_title() : default_title()}
 
             <Cards>
                 {list_of_films()}
