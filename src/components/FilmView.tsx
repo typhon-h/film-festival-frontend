@@ -136,7 +136,7 @@ const FilmView = (props: any) => {
             <div className="d-flex flex-column">
                 {(timedOut) ? error_timed_out() : ''}
                 {(errorFlag) ? error_unexpected() : ''}
-                {default_title()}
+                {(isSearch) ? search_title() : default_title()}
                 {placeholder()}
             </div>
         )
