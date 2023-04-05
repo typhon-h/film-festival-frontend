@@ -26,7 +26,6 @@ const FilmView = (props: any) => {
             setIsSearch((searchParams.get('q')) ? true : false)
             query += (isSearch) ? `&q=${searchParams.get('q')}` : ''
 
-            console.log(query)
             return query
         }
 
@@ -133,7 +132,6 @@ const FilmView = (props: any) => {
     }
 
     if (props.placeholder || loading) {
-        console.log(loading)
         return (
             <div className="d-flex flex-column">
                 {(timedOut) ? error_timed_out() : ''}
