@@ -3,23 +3,32 @@ import FilmCard from "../components/FilmCard";
 import axios from "axios";
 import Cards from "../layouts/Cards";
 import FilmCardPlaceholder from "../components/placeholder/FilmCardPlaceholder";
+import { useSearchParams } from "react-router-dom";
 
 const FilmView = (props: any) => {
 
+    const [searchParams] = useSearchParams();
     const [films, setFilms] = React.useState<Array<Film>>([])
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [loading, setLoading] = React.useState(true)
     const [timedOut, setTimedOut] = React.useState(false)
 
-
     React.useEffect(() => {
         const timer = setTimeout(() => {
             setTimedOut(true)
         }, 1500)
 
+        const buildQuery = () => {
+            let query = ""
+
+            query += (searchParams.get('q')) ? `&q=${searchParams.get('q')}` : ''
+            console.log(query)
+            return query
+        }
+
         const getFilms = () => {
-            axios.get(process.env.REACT_APP_DOMAIN + "/films")
+            axios.get(process.env.REACT_APP_DOMAIN + "/films?unused=" + buildQuery())
                 .then((response) => {
                     setErrorFlag(false)
                     setFilms(response.data.films)
@@ -37,13 +46,7 @@ const FilmView = (props: any) => {
         }
 
         getFilms()
-
-        return () => {
-
-        }
-    }, [])
-
-
+    }, [searchParams])
 
     const list_of_films = () => {
         return films.map((film: Film) =>
