@@ -71,7 +71,7 @@ const FilmCard = (props: any) => {
                 <div className="d-flex flex-column flex-md-row justify-content-around p-2">
                     <div className="d-flex flex-column mb-3">
                         <div className="mb-3">
-                            <p className="card-text mb-1 fw-bold">Classification</p>
+                            <p className="card-text mb-1 fw-bold">Age Rating</p>
                             <p className="card-text">{props.film.ageRating}</p>
                         </div>
 
