@@ -88,11 +88,29 @@ const ViewFilms = () => {
             <div className="d-flex flex-column">
                 {(errorFlag && !timedOut) ? error_unexpected() : ''}
                 {(timedOut) ? error_timed_out() : ''}
-                <Cards>
-                    <FilmCardPlaceholder />
-                    <FilmCardPlaceholder />
-                    <FilmCardPlaceholder />
-                </Cards>
+                <div className="d-flex flex-column d-sm-none">
+                    <Cards>
+                        <FilmCardPlaceholder />
+                    </Cards>
+                </div>
+
+                <div className="d-none flex-column d-sm-flex d-md-none">
+                    <Cards>
+                        <FilmCardPlaceholder />
+                        <FilmCardPlaceholder />
+                    </Cards>
+                </div>
+
+                <div className="d-none flex-column d-md-flex">
+                    <Cards>
+                        <FilmCardPlaceholder />
+                        <FilmCardPlaceholder />
+                        <FilmCardPlaceholder />
+                        <FilmCardPlaceholder />
+                        <FilmCardPlaceholder />
+                        <FilmCardPlaceholder />
+                    </Cards>
+                </div>
             </div>
         )
     }
