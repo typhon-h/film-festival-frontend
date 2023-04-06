@@ -4,10 +4,11 @@ import axios from "axios";
 import Cards from "../layouts/Cards";
 import FilmCardPlaceholder from "../components/placeholder/FilmCardPlaceholder";
 import { useSearchParams } from "react-router-dom";
+import Filters from "./Filters";
 
 const FilmView = (props: any) => {
 
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [films, setFilms] = React.useState<Array<Film>>([])
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
@@ -25,6 +26,20 @@ const FilmView = (props: any) => {
 
             setIsSearch((searchParams.get('q')) ? true : false)
             query += (isSearch) ? `&q=${searchParams.get('q')}` : ''
+
+            const ratings = searchParams.getAll('ageRatings')
+            if (ratings) {
+                ratings.forEach(r => {
+                    query += `&ageRatings=${r}`
+                })
+            }
+
+            const genres = searchParams.getAll('genreIds')
+            if (genres) {
+                genres.forEach(g => {
+                    query += `&genreIds=${g}`
+                })
+            }
 
             return query
         }
@@ -52,7 +67,7 @@ const FilmView = (props: any) => {
         }
 
         getFilms()
-    }, [props.placeholder, isSearch, searchParams])
+    }, [isSearch, searchParams])
 
     const list_of_films = () => {
         return films.map((film: Film) =>
@@ -86,7 +101,7 @@ const FilmView = (props: any) => {
 
     const search_title = () => {
         return (
-            <div className="my-2">
+            <div className="my-1">
                 <h1 className="text-muted">Showing Results For:</h1>
                 <h3 className={(films.length === 0) ? "text-danger" : "text-success"}>{searchParams.get('q')}</h3>
             </div>
@@ -95,7 +110,7 @@ const FilmView = (props: any) => {
 
     const default_title = () => {
         return (
-            <div className="my-2">
+            <div className="my-1">
                 <h1 className="text-muted">All Films</h1>
             </div>
         )
@@ -150,6 +165,8 @@ const FilmView = (props: any) => {
 
             {(isSearch) ? search_title() : default_title()}
 
+            <Filters updateParams={setSearchParams} />
+
             <Cards>
                 {list_of_films()}
             </Cards>
@@ -157,5 +174,4 @@ const FilmView = (props: any) => {
     )
 
 }
-
 export default FilmView;
