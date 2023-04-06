@@ -32,12 +32,12 @@ const FilterDropdown = (props: any) => {
 
     const options = () => {
         return props.options.map((opt: FilterOption) =>
-            < div className="form-check mb-2" key={opt.value} >
-                <input className="form-check-input" checked={searchParams.getAll(props.queryParam).includes(opt.value)} onChange={() => { filter(opt.value) }} type="checkbox" id={'check' + props.queryParam + opt.name} />
-                <label className="form-check-label" htmlFor={'check' + props.queryParam + opt.name}>
+            <label role="button" className="form-check mb-2" key={opt.value} htmlFor={'check' + props.queryParam + opt.name}>
+                <input role="button" className="form-check-input" checked={searchParams.getAll(props.queryParam).includes(opt.value)} onChange={() => { filter(opt.value) }} type="checkbox" id={'check' + props.queryParam + opt.name} />
+                <label role="button" className="form-check-label" htmlFor={'check' + props.queryParam + opt.name}>
                     {opt.name}
                 </label>
-            </div >
+            </label >
         )
     }
 
