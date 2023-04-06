@@ -5,6 +5,7 @@ import Cards from "../layouts/Cards";
 import FilmCardPlaceholder from "../components/placeholder/FilmCardPlaceholder";
 import { useSearchParams } from "react-router-dom";
 import Filters from "./Filters";
+import Sort from "./Sort";
 
 const FilmView = (props: any) => {
 
@@ -40,6 +41,8 @@ const FilmView = (props: any) => {
                     query += `&genreIds=${g}`
                 })
             }
+
+            query += (searchParams.get('sortBy')) ? `&sortBy=${searchParams.get('sortBy')?.toUpperCase()}` : ''
 
             return query
         }
@@ -165,7 +168,12 @@ const FilmView = (props: any) => {
 
             {(isSearch) ? search_title() : default_title()}
 
-            <Filters updateParams={setSearchParams} />
+            <div className='d-flex flex-column-reverse flex-md-row align-items-end align-items-md-start justify-content-between mx-5 mb-2'>
+                <Sort updateParams={setSearchParams} />
+                <Filters updateParams={setSearchParams} />
+
+            </div>
+
 
             <Cards>
                 {list_of_films()}
