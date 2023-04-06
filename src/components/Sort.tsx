@@ -17,8 +17,6 @@ const Sort = (props: any) => {
 
     React.useEffect(() => {
         // Trigger re-render on button press to change visible state
-        // console.log(sortAsc)
-        // console.log(sortBy)
 
         const updateSort = () => {
             searchParams.delete('sortBy')
