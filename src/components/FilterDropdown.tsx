@@ -1,5 +1,4 @@
 import { useSearchParams } from "react-router-dom";
-import { useFiltersActive } from "./Filters";
 
 const FilterDropdown = (props: any) => {
     const [searchParams] = useSearchParams();
