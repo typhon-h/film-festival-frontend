@@ -8,3 +8,14 @@ type Image = {
      */
     type: string
 }
+
+type FilterOption = {
+    /**
+     * Name to be displayed as filter option
+     */
+    name: string,
+    /**
+     * Value to be passed to query param
+     */
+    value: string
+}
