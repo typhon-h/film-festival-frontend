@@ -43,8 +43,4 @@ const FilterDropdown = (props: any) => {
 
 }
 
-
-
-
-
 export default FilterDropdown
