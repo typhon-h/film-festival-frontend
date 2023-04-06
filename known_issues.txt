@@ -1,0 +1,5 @@
+View Films
+    - All results briefly load before search
+
+ Filter Films
+    - Cannot adjust filter criteria while films loading
