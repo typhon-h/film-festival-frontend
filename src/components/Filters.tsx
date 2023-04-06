@@ -51,7 +51,7 @@ const Filters = (props: any) => {
 
     return (
         <div className="d-flex flex-row justify-content-end me-5 mb-2">
-            <button className="btn btn-primary col-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filters" aria-controls="filters"><i className="bi bi-funnel"></i> Filter</button>
+            <button className="btn btn-primary col-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filters" aria-controls="filters"><i className={'bi bi-funnel' + ((useFiltersActive()) ? '-fill' : '')}></i> Filter</button>
 
             <div className="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabIndex={-1} id="filters" aria-labelledby="filtersLabel">
                 <div className="offcanvas-header">

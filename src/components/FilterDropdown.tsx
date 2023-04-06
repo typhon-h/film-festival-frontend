@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import { useFiltersActive } from "./Filters";
 
 const FilterDropdown = (props: any) => {
     const [searchParams] = useSearchParams();
@@ -27,14 +28,11 @@ const FilterDropdown = (props: any) => {
                 </label>
             </div >
         )
-
     }
-
-
 
     return (
         <div className='d-flex flex-column w-100'>
-            <button className="btn btn-outline-secondary mb-2" id={props.queryParam + "FiltersCollapseButton"} type="button" data-bs-toggle="collapse" data-bs-target={'#' + props.queryParam + 'FiltersCollapse'} aria-expanded="false" aria-controls={props.queryParam + 'FiltersCollapse'}>{props.name} <i className={'bi bi-caret-down'}></i></button>
+            <button className="btn btn-outline-secondary mb-2" id={props.queryParam + "FiltersCollapseButton"} type="button" data-bs-toggle="collapse" data-bs-target={'#' + props.queryParam + 'FiltersCollapse'} aria-expanded="false" aria-controls={props.queryParam + 'FiltersCollapse'}>{props.name} <i className={'bi bi-caret-down' + ((searchParams.has(props.queryParam)) ? '-fill' : '')}></i></button>
             <div className="collapse" id={props.queryParam + 'FiltersCollapse'}>
                 <ul className="card card-body w-100 p-2" aria-labelledby={props.queryParam + 'FiltersCollapseButton'}>
                     {options()}
