@@ -3,18 +3,22 @@ import { useSearchParams } from "react-router-dom"
 
 const Sort = (props: any) => {
     const [searchParams] = useSearchParams();
-    const [sortAsc, setSortAsc] = React.useState((searchParams.has('sortBy')) ? searchParams.get('sortBy')?.substring(searchParams.get('sortBy')?.lastIndexOf('_') as number).toUpperCase() === 'ASC' : true)
+    const [sortAsc, setSortAsc] = React.useState((searchParams.has('sortBy')) ? searchParams.get('sortBy')?.substring(searchParams.get('sortBy')?.lastIndexOf('_') as number + 1).toUpperCase() === 'ASC' : true)
     const [sortBy, setSortBy] = React.useState((searchParams.has('sortBy')) ? searchParams.get('sortBy')?.substring(0, searchParams.get('sortBy')?.lastIndexOf('_')).toUpperCase() : 'RELEASED')
 
     const sorts = [
-        { label: 'Alphabetical', value: 'ALPHABETICAL' },
-        { label: 'Rating', value: 'RATING' },
-        { label: 'Release Date', value: 'RELEASED' },
+        { label: 'Alphabetical A-Z', value: 'ALPHABETICAL_ASC' },
+        { label: 'Alphabetical Z-A', value: 'ALPHABETICAL_DESC' },
+        { label: 'Worst to Best', value: 'RATING_ASC' },
+        { label: 'Best to Worst', value: 'RATING_DESC' },
+        { label: 'Oldest', value: 'RELEASED_ASC' },
+        { label: 'Most Recent', value: 'RELEASED_DESC' }
     ]
 
     React.useEffect(() => {
         // Trigger re-render on button press to change visible state
-
+        // console.log(sortAsc)
+        // console.log(sortBy)
 
         const updateSort = () => {
             searchParams.delete('sortBy')
@@ -34,7 +38,8 @@ const Sort = (props: any) => {
     }
 
     const changeSortBy = (v: string) => { // CHANGING ORDER WORKS FINE - CHANGING STRING LAGS BY 1 (CONSIDER ENUM)
-        setSortBy(v)
+        setSortBy(v.substring(0, v.lastIndexOf('_')))
+        setSortAsc(v.substring(v.lastIndexOf('_') + 1).toUpperCase() === 'ASC')
     }
 
     const options = () => {
@@ -49,10 +54,10 @@ const Sort = (props: any) => {
         <div className="d-flex col-12 col-md-5 col-lg-4 col-xl-3">
             <div className="input-group mb-3 h-100">
                 <label className="input-group-text" htmlFor="sortFilmSelect">Sort by:</label>
-                <select onChange={({ target: { value } }) => changeSortBy(value)} defaultValue={sortBy} className="form-select" id="sortFilmSelect" aria-label="Sort Films">
+                <select onChange={({ target: { value } }) => changeSortBy(value)} value={sortBy + '_' + (sortAsc ? 'ASC' : 'DESC')} className="form-select" id="sortFilmSelect" aria-label="Sort Films">
                     {options()}
                 </select>
-                <button onClick={toggleSortDirection} className="btn btn-outline-secondary" type="button"><i className={'bi bi-arrow-' + ((sortAsc) ? 'down' : 'up')}></i></button>
+                <button onClick={toggleSortDirection} className="btn btn-outline-secondary" type="button"><i className={'bi bi-sort-' + ((sortAsc) ? 'down' : 'up')}></i></button>
             </div>
         </div>
     )
