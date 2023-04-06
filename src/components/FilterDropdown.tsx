@@ -1,8 +1,21 @@
+import React from "react";
 import { useSearchParams } from "react-router-dom";
 
 const FilterDropdown = (props: any) => {
     const [searchParams] = useSearchParams();
+    const [expanded, setExpanded] = React.useState(false);
 
+
+    React.useEffect(() => {
+        // Re-renders drop down to update button text arrow direction
+        return;
+
+    }, [expanded])
+
+
+    const toggleExpanded = () => {
+        setExpanded(!expanded);
+    }
 
     const filter = (e: string) => {
         if (!searchParams.getAll(props.queryParam).includes(e)) {
@@ -30,7 +43,7 @@ const FilterDropdown = (props: any) => {
 
     return (
         <div className='d-flex flex-column w-100'>
-            <button className="btn btn-outline-secondary mb-2" id={props.queryParam + "FiltersCollapseButton"} type="button" data-bs-toggle="collapse" data-bs-target={'#' + props.queryParam + 'FiltersCollapse'} aria-expanded="false" aria-controls={props.queryParam + 'FiltersCollapse'}>{props.name} <i className={'bi bi-caret-down' + ((searchParams.has(props.queryParam)) ? '-fill' : '')}></i></button>
+            <button onClick={toggleExpanded} className="btn btn-outline-secondary mb-2" id={props.queryParam + "FiltersCollapseButton"} type="button" data-bs-toggle="collapse" data-bs-target={'#' + props.queryParam + 'FiltersCollapse'} aria-controls={props.queryParam + 'FiltersCollapse'}>{props.name} <i className={'bi bi-caret-' + ((expanded) ? 'down' : 'up') + ((searchParams.has(props.queryParam)) ? '-fill' : '')}></i></button>
             <div className="collapse" id={props.queryParam + 'FiltersCollapse'}>
                 <ul className="card card-body w-100 p-2" aria-labelledby={props.queryParam + 'FiltersCollapseButton'}>
                     {options()}
