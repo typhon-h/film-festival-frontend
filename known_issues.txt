@@ -1,6 +1,5 @@
 View Films
     - All results briefly load before search
-    - Reconnecting to internet does not automatically load content
 
  Filter Films
     - Cannot adjust filter criteria while films loading

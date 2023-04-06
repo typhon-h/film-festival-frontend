@@ -67,7 +67,7 @@ const FilmView = (props: any) => {
         }
 
         getFilms()
-    }, [isSearch, searchParams])
+    }, [isSearch, searchParams, props.placeholder])
 
     const list_of_films = () => {
         return films.map((film: Film) =>
