@@ -62,6 +62,8 @@ const FilmView = (props: any) => {
                     setLoading(false)
                     clearTimeout(timer)
                     setTimedOut(false)
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
                 }, (error) => {
                     console.log(error)
 
