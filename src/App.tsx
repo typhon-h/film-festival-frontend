@@ -35,8 +35,9 @@ function App() {
           </div>
 
           {/* Return to top button */}
-          <div ref={ref} className='justify-content-center fixed-bottom m-4 col-2 col-md-1 m-md-5' style={{ display: 'none', left: 'auto' }}>
-            <button onClick={() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }} className='btn btn-outline-info bg-light fs-2 col-12'><i className="bi bi-arrow-up-circle"></i></button>
+          <div ref={ref} className='justify-content-center fixed-bottom m-4 m-md-5' style={{ display: 'none', left: 'auto' }}>
+
+            <span role={'button'} onClick={() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }} className='fs-1 text-info p-0'><i className="bi bi-arrow-up-circle-fill "></i></span>
           </div>
         </Main>
       </Router>
