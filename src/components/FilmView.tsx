@@ -6,6 +6,7 @@ import FilmCardPlaceholder from "../components/placeholder/FilmCardPlaceholder";
 import { useSearchParams } from "react-router-dom";
 import Filters from "./Filters";
 import Sort from "./Sort";
+import Pagination from "./Pagination";
 
 const FilmView = (props: any) => {
 
@@ -16,6 +17,8 @@ const FilmView = (props: any) => {
     const [loading, setLoading] = React.useState(true)
     const [timedOut, setTimedOut] = React.useState(false)
     const [isSearch, setIsSearch] = React.useState(false)
+    const [page, setPage] = React.useState<PageInfo>()
+    const [numFilms, setNumFilms] = React.useState(0)
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
@@ -23,7 +26,9 @@ const FilmView = (props: any) => {
         }, 1500)
 
         const buildQuery = () => {
-            let query = ""
+            let query = "?"
+            query += `startIndex=${(page) ? page.startIndex : 0}`
+            query += `&count=${(page) ? page.count : 10}`
 
             setIsSearch((searchParams.get('q')) ? true : false)
             query += (isSearch) ? `&q=${searchParams.get('q')}` : ''
@@ -48,10 +53,12 @@ const FilmView = (props: any) => {
         }
 
         const getFilms = () => {
-            axios.get(process.env.REACT_APP_DOMAIN + "/films?unused=" + buildQuery())
+            console.log(process.env.REACT_APP_DOMAIN + "/films" + buildQuery())
+            axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery())
                 .then((response) => {
                     setErrorFlag(false)
                     setFilms(response.data.films)
+                    setNumFilms(response.data.count)
                     setLoading(false)
                     clearTimeout(timer)
                     setTimedOut(false)
@@ -70,7 +77,7 @@ const FilmView = (props: any) => {
         }
 
         getFilms()
-    }, [isSearch, searchParams, props.placeholder])
+    }, [isSearch, searchParams, props.placeholder, page])
 
     const list_of_films = () => {
         return films.map((film: Film) =>
@@ -178,6 +185,8 @@ const FilmView = (props: any) => {
             <Cards>
                 {list_of_films()}
             </Cards>
+
+            <Pagination numFilms={numFilms} updatePage={setPage} />
         </div>
     )
 
