@@ -77,10 +77,19 @@ const Pagination = (props: any) => {
         }
     }
 
+    const end_of_results = () => {
+        return (
+            <div>
+                <hr />
+                <p className="text-secondary">End of Results</p>
+            </div>
+        )
+    }
+
     // Centering the pagination using janky column alignment - use absolute positioning probably better
     return (
         <div className='d-flex flex-column'>
-            {(activePage === allPages.length) ? <hr /> : ''}
+            {(activePage === allPages.length) ? end_of_results() : ''}
             <div className="d-flex flex-column-reverse flex-md-row">
 
                 <div className='d-flex mx-5 '>
