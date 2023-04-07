@@ -1,8 +1,10 @@
 import React from "react"
 
 const Pagination = (props: any) => {
-    const [page, setPage] = React.useState<PageInfo>({ startIndex: 0, count: 10 })
-    const [activePage, setActivePage] = React.useState((page.startIndex) ? Math.ceil(page.startIndex / page.count) : 1)
+    const allowedPageSizes = [5, 6, 7, 8, 9, 10]
+
+    const [page, setPage] = React.useState<PageInfo>({ startIndex: 0, count: allowedPageSizes.at(-1) as number })
+    const [activePage, setActivePage] = React.useState(1)
     const [allPages, setAllPages] = React.useState<number[]>([])
 
     const updateActivePage = (page: number) => {
@@ -46,8 +48,7 @@ const Pagination = (props: any) => {
         } else {
             shownPages = allPages.slice(activePage - Math.ceil(numPageButtons / 2), activePage + Math.floor(numPageButtons / 2))
         }
-        console.log(shownPages)
-        console.log(activePage)
+
         return shownPages.map((p) => {
             return (
                 <li key={p} role={'button'} onClick={() => { updateActivePage(p) }} className={'page-item ' + ((activePage === p) ? 'active' : '')}><span className="page-link">{p}</span></li>
@@ -62,26 +63,78 @@ const Pagination = (props: any) => {
         )
     }
 
+    const pageSizeOptions = () => {
+        return allowedPageSizes.map((p) => {
+            return (
+                <option key={p} value={p}>{p}</option>
+            )
+        })
+    }
+
+    const updatePageSize = (e: string) => {
+        if (allowedPageSizes.includes(parseInt(e))) {
+            setPage({ startIndex: page.startIndex, count: parseInt(e) })
+        }
+    }
+
+    // Centering the pagination using janky column alignment - use absolute positioning probably better
     return (
         <div className='d-flex flex-column'>
             {(activePage === allPages.length) ? <hr /> : ''}
-            <nav aria-label="Film Pagination">
-                <ul className="pagination justify-content-center">
-                    <li role={((activePage === 1) ? '' : 'button')} onClick={() => { updateActivePage(1) }} className={'page-item ' + ((activePage === 1) ? 'disabled' : '')}>
-                        <span className="page-link"><i className="bi bi-skip-start-fill"></i></span>
-                    </li>
-                    <li role={((activePage === 1) ? '' : 'button')} onClick={() => { updateActivePage(activePage - 1) }} className={'page-item ' + ((activePage === 1) ? 'disabled' : '')}>
-                        <span className="page-link"><i className="bi bi-caret-left-fill"></i></span>
-                    </li>
-                    {pageItems()}
-                    <li role={((activePage === allPages.length) ? '' : 'button')} onClick={() => { updateActivePage(activePage + 1) }} className={'page-item ' + ((activePage === allPages.length) ? 'disabled' : '')}>
-                        <span className="page-link"><i className="bi bi-caret-right-fill"></i></span>
-                    </li>
-                    <li role={((activePage === allPages.length) ? '' : 'button')} onClick={() => { updateActivePage(allPages.length) }} className={'page-item ' + ((activePage === allPages.length) ? 'disabled' : '')}>
-                        <span className="page-link"><i className="bi bi-skip-end-fill"></i></span>
-                    </li>
-                </ul>
-            </nav >
+            <div className="d-flex flex-column-reverse flex-md-row">
+
+                <div className='d-flex mx-5 '>
+                    <div className="input-group mb-3">
+                        <label className="input-group-text" htmlFor="pageSizeSelect">Items Per Page:</label>
+                        <select onChange={({ target: { value } }) => updatePageSize(value)} className="form-select col-3" id="pageSizeSelect" defaultValue={page.count}>
+                            {pageSizeOptions()}
+                        </select>
+                    </div>
+                </div>
+
+
+                <nav aria-label="Film Pagination" className="d-flex justify-content-center">
+                    <ul className="pagination d-none d-md-flex position-absolute" style={{ left: '50%', transform: 'translate(-50%, 0%)' }}>
+                        <li role={((activePage === 1) ? '' : 'button')} onClick={() => { updateActivePage(1) }} className={'page-item ' + ((activePage === 1) ? 'disabled' : '')}>
+                            <span className="page-link"><i className="bi bi-skip-start-fill"></i></span>
+                        </li>
+                        <li role={((activePage === 1) ? '' : 'button')} onClick={() => { updateActivePage(activePage - 1) }} className={'page-item ' + ((activePage === 1) ? 'disabled' : '')}>
+                            <span className="page-link"><i className="bi bi-caret-left-fill"></i></span>
+                        </li>
+                        {pageItems()}
+                        <li role={((activePage === allPages.length) ? '' : 'button')} onClick={() => { updateActivePage(activePage + 1) }} className={'page-item ' + ((activePage === allPages.length) ? 'disabled' : '')}>
+                            <span className="page-link"><i className="bi bi-caret-right-fill"></i></span>
+                        </li>
+                        <li role={((activePage === allPages.length) ? '' : 'button')} onClick={() => { updateActivePage(allPages.length) }} className={'page-item ' + ((activePage === allPages.length) ? 'disabled' : '')}>
+                            <span className="page-link"><i className="bi bi-skip-end-fill"></i></span>
+                        </li>
+                    </ul>
+
+                    <div className="d-md-none">
+                        <ul className="pagination justify-content-center">
+
+                            {pageItems()}
+
+                        </ul>
+
+                        <ul className="pagination justify-content-center">
+                            <li role={((activePage === 1) ? '' : 'button')} onClick={() => { updateActivePage(1) }} className={'page-item ' + ((activePage === 1) ? 'disabled' : '')}>
+                                <span className="page-link"><i className="bi bi-skip-start-fill"></i></span>
+                            </li>
+                            <li role={((activePage === 1) ? '' : 'button')} onClick={() => { updateActivePage(activePage - 1) }} className={'page-item ' + ((activePage === 1) ? 'disabled' : '')}>
+                                <span className="page-link"><i className="bi bi-caret-left-fill"></i></span>
+                            </li>
+                            <li role={((activePage === allPages.length) ? '' : 'button')} onClick={() => { updateActivePage(activePage + 1) }} className={'page-item ' + ((activePage === allPages.length) ? 'disabled' : '')}>
+                                <span className="page-link"><i className="bi bi-caret-right-fill"></i></span>
+                            </li>
+                            <li role={((activePage === allPages.length) ? '' : 'button')} onClick={() => { updateActivePage(allPages.length) }} className={'page-item ' + ((activePage === allPages.length) ? 'disabled' : '')}>
+                                <span className="page-link"><i className="bi bi-skip-end-fill"></i></span>
+                            </li>
+                        </ul>
+                    </div>
+                </nav >
+            </div>
+
         </div>
     )
 }
