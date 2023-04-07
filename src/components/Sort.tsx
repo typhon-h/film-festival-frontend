@@ -9,8 +9,8 @@ const Sort = (props: any) => {
     const sorts = [
         { label: 'Alphabetical A-Z', value: 'ALPHABETICAL_ASC' },
         { label: 'Alphabetical Z-A', value: 'ALPHABETICAL_DESC' },
-        { label: 'Worst to Best', value: 'RATING_ASC' },
-        { label: 'Best to Worst', value: 'RATING_DESC' },
+        { label: 'Lowest Rated', value: 'RATING_ASC' },
+        { label: 'Highest Rated', value: 'RATING_DESC' },
         { label: 'Oldest', value: 'RELEASED_ASC' },
         { label: 'Most Recent', value: 'RELEASED_DESC' }
     ]
