@@ -19,3 +19,14 @@ type FilterOption = {
      */
     value: string
 }
+
+type PageInfo = {
+    /**
+     * Starting offset of page
+     */
+    startIndex: number,
+    /**
+     * Results per page
+     */
+    count: number
+}
