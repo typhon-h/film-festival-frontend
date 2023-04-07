@@ -1,5 +1,6 @@
 View Films
     - All results briefly load before search
+    - Pagination is not present in URL query - only benefit is under 1 'page' parameter
 
  Filter Films
     - Cannot adjust filter criteria while films loading
