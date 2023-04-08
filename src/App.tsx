@@ -30,7 +30,8 @@ function App() {
           <div style={{ minHeight: '85vh' }}>
             <Routes>
               <Route path="/films" element={<ViewFilms />}></Route>
-              <Route path="/component/test" element={<ViewFilm />} />
+              <Route path="/films/:filmId" element={<ViewFilm />}></Route>
+              <Route path="/component/test" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
