@@ -26,7 +26,7 @@ const DirectorCard = (props: any) => {
 
 
     return (
-        <div className={'d-flex flex-row align-items-center justify-content-around ' + (directorImageLoaded ? '' : 'placeholder-glow')}>
+        <div className={'d-flex flex-row align-items-center justify-content-around bg-light py-2 rounded-3 ' + (directorImageLoaded ? '' : 'placeholder-glow')}>
             <div className={'ratio ratio-1x1 rounded-circle border overflow-hidden ' + (directorImageLoaded ? '' : 'placeholder')} style={{ minWidth: '20%', maxWidth: '20%' }}>
                 <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={directorImage} alt="Director Icon" style={{ objectFit: 'cover' }} />
             </div>
