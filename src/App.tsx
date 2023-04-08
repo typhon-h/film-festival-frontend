@@ -4,6 +4,7 @@ import NotFound from "./pages/NotFound";
 import Main from './layouts/Main';
 import ViewFilms from './pages/ViewFilms';
 import React from 'react';
+import ViewFilm from './pages/ViewFilm';
 
 function App() {
   const ref = React.useRef<HTMLDivElement>(null)
@@ -29,7 +30,7 @@ function App() {
           <div style={{ minHeight: '85vh' }}>
             <Routes>
               <Route path="/films" element={<ViewFilms />}></Route>
-              <Route path="/component/test" element={<NotFound />} />
+              <Route path="/component/test" element={<ViewFilm />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
