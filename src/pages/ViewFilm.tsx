@@ -1,3 +1,4 @@
+import DirectorCard from "../components/DirectorCard"
 
 const ViewFilm = () => {
 
@@ -10,13 +11,7 @@ const ViewFilm = () => {
             <p className="d-inline-block w-100 text-dark text-truncate text-break"><b>Description: </b> syl;kjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkjskjsdflkj</p>
             <div className='d-flex flex-column w-100'>
                 <p className='align-self-start fw-bold'>Director:</p>
-                <div className={'d-flex flex-row align-items-center justify-content-around bg-light rounded-3'}>
-                    <div className={'ratio ratio-1x1 rounded-circle border overflow-hidden '} style={{ minWidth: '20%', maxWidth: '20%' }}>
-                        <img className={'mx-auto '} src='https://seng365.csse.canterbury.ac.nz/api/v1/users/1/image' alt="Director Icon" style={{ objectFit: 'cover' }} />
-                    </div>
-                    <p className="mb-0">FirstName</p>
-                    <p className="mb-0">LastName</p>
-                </div>
+                <DirectorCard director={{ id: 1, firstName: 'FName', lastName: 'LName' }} />
             </div>
 
             <div className='d-flex flex-column bg-light w-100 border rounded-3 p-3 my-3'>

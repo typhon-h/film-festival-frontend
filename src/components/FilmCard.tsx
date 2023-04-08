@@ -1,18 +1,15 @@
 import axios from "axios";
 import React from "react";
 import { Buffer } from "buffer";
-import default_profile_picture from "../assets/default_profile_picture.png";
 import default_film_picture from "../assets/default_film_picture.png";
+import DirectorCard from "./DirectorCard";
 
 const FilmCard = (props: any) => {
 
     const [genre, setGenre] = React.useState<Genre>({ genreId: 0, name: "Unknown" });
     const [heroImage, setHeroImage] = React.useState<string>("");
-    const [directorImage, setDirectorImage] = React.useState<string>("");
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
-    const [directorImageLoaded, setDirectorImageLoaded] = React.useState<boolean>(false);
-
     React.useEffect(() => {
         const getGenre = () => {
             axios.get((process.env.REACT_APP_DOMAIN as string) + '/films/genres')
@@ -42,21 +39,6 @@ const FilmCard = (props: any) => {
 
         getHeroImage()
     }, [props.film.filmId])
-
-    React.useEffect(() => {
-        const getDirectorImage = () => {
-            axios.get((process.env.REACT_APP_DOMAIN as string) + '/users/' + props.film.directorId + '/image', { responseType: "arraybuffer" })
-                .then((response) => {
-                    setDirectorImage(`data: ${response.headers['content-type']}; base64, ${Buffer.from(response.data, 'binary').toString('base64')}`);
-                    setDirectorImageLoaded(true)
-                }, (error) => {
-                    setDirectorImage(default_profile_picture);
-                    setDirectorImageLoaded(true);
-                })
-        }
-
-        getDirectorImage()
-    }, [props.film.directorId])
 
 
     return (
@@ -93,14 +75,10 @@ const FilmCard = (props: any) => {
                         </div>
                     </div>
                 </div>
+
                 <hr />
-                <div className={'d-flex flex-row align-items-center justify-content-around ' + (directorImageLoaded ? '' : 'placeholder-glow')}>
-                    <div className={'ratio ratio-1x1 rounded-circle border overflow-hidden ' + (directorImageLoaded ? '' : 'placeholder')} style={{ minWidth: '20%', maxWidth: '20%' }}>
-                        <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={directorImage} alt="Director Icon" style={{ objectFit: 'cover' }} />
-                    </div>
-                    <p className="mb-0">{props.film.directorFirstName}</p>
-                    <p className="mb-0">{props.film.directorLastName}</p>
-                </div>
+
+                <DirectorCard director={{ id: props.film.directorId, firstName: props.film.directorFirstName, lastName: props.film.directorLastName }} />
 
             </div>
 
