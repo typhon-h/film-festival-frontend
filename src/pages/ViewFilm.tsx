@@ -187,11 +187,12 @@ const ViewFilm = (props: any) => {
             {(errorFlag) ? error_unexpected() : ''}
             <h1 className='fs-1 text-secondary align-self-center mb-3'>{film.title}</h1>
             <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
-                <div className='d-flex flex-column col-12 col-sm-10 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5'>
-                    <div className='d-flex flex-column align-self-center col-12 col-sm-10 col-lg-12 mb-3 mb-sm-0'>
-                        <img className={'img-fluid img-thumbnail ' + ((!heroImageLoaded) ? 'placeholder' : '')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
+                <div className='d-flex flex-column col-12 col-sm-8 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5'>
+                    <div className={'ratio ratio-1x1 ' + (heroImageLoaded ? '' : 'placeholder')} >
+                        <img className={'mx-auto ratio ratio-1x1 ' + ((!heroImageLoaded) ? 'placeholder' : '')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
                     </div>
                 </div>
+
                 <div className='d-flex flex-column flex-sm-row-reverse flex-lg-column col-12 col-lg-7 col-xxl-7 justify-content-sm-around justify-content-xxl-center align-items-center m-sm-3 mt-lg-0'>
                     <div className='d-flex flex-column col-12 col-sm-6 col-lg-12 col-xxl-12'>
                         <p className="d-inline-block col-12 text-dark text-start text-wrap text-break"><b>Description: </b>{film.description}</p>
@@ -213,7 +214,6 @@ const ViewFilm = (props: any) => {
             </div>
 
             <div className='d-flex flex-column col-12 col-md-5 col-lg-8 col-xxl-6'>
-                <h3>You may also enjoy</h3>
                 <SimilarFilms filmId={film.filmId} directorId={film.directorId} genreId={film.genreId} />
             </div>
 
