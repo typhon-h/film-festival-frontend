@@ -1,3 +1,5 @@
+import DirectorCardPlaceholder from "./DirectorCardPlaceholder";
+
 const FilmCardPlaceholder = () => {
 
     return (
@@ -35,13 +37,7 @@ const FilmCardPlaceholder = () => {
                     </div>
                 </div>
                 <hr />
-                <div className={'d-flex flex-row align-items-center justify-content-around placeholder-glow'}>
-                    <div className={'ratio ratio-1x1 rounded-circle border overflow-hidden placeholder'} style={{ minWidth: '20%', maxWidth: '20%' }}>
-                        <img className="mx-auto d-none" src='' alt="Director Icon" style={{ objectFit: 'cover' }} />
-                    </div>
-                    <p className="mb-0 col-5"><span className="col-10 placeholder"></span></p>
-                    <p className="mb-0 col-5"><span className="col-10 placeholder"></span></p>
-                </div>
+                <DirectorCardPlaceholder />
 
             </div>
 
