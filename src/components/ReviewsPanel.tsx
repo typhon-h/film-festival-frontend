@@ -28,7 +28,7 @@ const ReviewsPanel = (props: any) => {
 
                     if (error.code !== "ERR_NETWORK") {
 
-                        setErrorMessage("An error occurred while fetching reviews. Please refresh the page")
+                        setErrorMessage("An error occurred while fetching reviews. Please try again")
                     }
 
                     clearTimeout(timer)
@@ -72,8 +72,9 @@ const ReviewsPanel = (props: any) => {
 
         if (timedOut) { // Should never get here, slow network will be monitored at page level
             return (
-                <div className="spinner-border" role="status">
-                    <span className="sr-only">Loading...</span>
+                <div className='p-2'>
+                    <div className="spinner-border" role="status">
+                    </div>
                 </div>
             )
         } else if (errorFlag) {
