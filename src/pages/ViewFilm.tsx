@@ -90,7 +90,7 @@ const ViewFilm = (props: any) => {
             <div className='d-flex flex-column align-self-center'>
                 <img className='img-fluid img-thumbnail' src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
             </div>
-            <p className="d-inline-block w-100 text-dark text-truncate text-break"><b>Description: </b>{film.description}</p>
+            <p className="d-inline-block w-100 text-dark text-start text-wrap text-break"><b>Description: </b>{film.description}</p>
             <div className='d-flex flex-column w-100'>
                 <p className='align-self-start fw-bold'>Director:</p>
                 <DirectorCard director={{ id: film.directorId, firstName: film.directorFirstName, lastName: film.directorLastName }} />
