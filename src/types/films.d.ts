@@ -103,3 +103,30 @@ type Genre = {
      */
     name: string
 }
+
+type Review = {
+    /**
+     * Id of the user who completed the review
+     */
+    reviewerId: number,
+    /**
+     * Rating out of 10 from the user
+     */
+    rating: number,
+    /**
+     * Written explanation of the review
+     */
+    review: string,
+    /**
+     * First name of the user who reviewed the review
+     */
+    reviewerFirstName: string,
+    /**
+     * Last name of the user who reviewed the review
+     */
+    reviewerLastName: string,
+    /**
+     * Time of the review
+     */
+    timestamp: string
+}
