@@ -171,18 +171,17 @@ const FilmView = (props: any) => {
 
     return (
         <div className="d-flex flex-column">
-            {(films.length === 0) ? info_no_films() : ''}
             {(timedOut) ? error_timed_out() : ''}
             {(errorFlag) ? error_unexpected() : ''}
 
             {(isSearch) ? search_title() : default_title()}
 
-            <div className='d-flex flex-column-reverse flex-md-row align-items-end align-items-md-start justify-content-between mx-5 mb-2'>
+            <div className={'d-flex flex-column-reverse flex-md-row align-items-end align-items-md-start justify-content-between mx-5 mb-2 ' + ((films.length === 0) ? 'd-none' : '')}>
                 <Sort updateParams={setSearchParams} />
                 <Filters updateParams={setSearchParams} />
             </div>
 
-
+            {(films.length === 0) ? info_no_films() : ''}
             <Cards>
                 {list_of_films()}
             </Cards>
