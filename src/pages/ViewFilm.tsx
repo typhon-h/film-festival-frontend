@@ -188,7 +188,7 @@ const ViewFilm = (props: any) => {
             <h1 className='fs-1 text-secondary align-self-center mb-3'>{film.title}</h1>
             <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
                 <div className='d-flex flex-column col-12 col-sm-10 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5'>
-                    <div className='d-flex flex-column align-self-center col-sm-10 col-lg-12 mb-3 mb-sm-0'>
+                    <div className='d-flex flex-column align-self-center col-12 col-sm-10 col-lg-12 mb-3 mb-sm-0'>
                         <img className={'img-fluid img-thumbnail ' + ((!heroImageLoaded) ? 'placeholder' : '')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
                     </div>
                 </div>
