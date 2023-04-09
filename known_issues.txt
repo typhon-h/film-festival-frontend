@@ -7,3 +7,6 @@ View Films
 
 View Film
    - Cannot see date on review to verify sort
+
+Similar Films
+   - No message if no similar films

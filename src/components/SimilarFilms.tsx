@@ -54,31 +54,41 @@ const SimilarFilms = (props: any) => {
         return arr2;
     }
 
+    if (getFilms().length === 0) {
+        return (
+            <div></div>
+        )
+    }
+
     return (
-        <div id="similarFilms" className="carousel carousel-dark slide" data-bs-ride="carousel">
-            <div className="carousel-indicators">
-                {getFilms().map((film: Film, index) =>
-                    <button key={index} type="button" data-bs-target="#similarFilms" data-bs-slide-to={index} className={' ' + ((index === 0) ? 'active' : '')} aria-current={((index === 0) ? true : false)} aria-label={`Slide ${index}`}></button>
-                )}
-            </div>
-            <div className="carousel-inner">
+        <div className='d-flex flex-column align-items-center col-12'>
+            <h3>You may also enjoy</h3>
 
-                {getFilms().map((film: Film, index) =>
-                    <div key={index} className={"carousel-item " + ((index === 0) ? 'active' : '')}>
-                        <FilmCard film={film} />
-                    </div>
-                )}
+            <div id="similarFilms" className="carousel carousel-dark slide col-12" data-bs-ride="carousel">
+                <div className="carousel-indicators">
+                    {getFilms().map((film: Film, index) =>
+                        <button key={index} type="button" data-bs-target="#similarFilms" data-bs-slide-to={index} className={' ' + ((index === 0) ? 'active' : '')} aria-current={((index === 0) ? true : false)} aria-label={`Slide ${index}`}></button>
+                    )}
+                </div>
+                <div className="carousel-inner">
 
+                    {getFilms().map((film: Film, index) =>
+                        <div key={index} className={"carousel-item " + ((index === 0) ? 'active' : '')}>
+                            <FilmCard film={film} />
+                        </div>
+                    )}
+
+                </div >
+                <button className="carousel-control-prev" type="button" data-bs-target="#similarFilms" data-bs-slide="prev">
+                    <span className="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                    <span className="visually-hidden">Previous</span>
+                </button>
+                <button className="carousel-control-next" type="button" data-bs-target="#similarFilms" data-bs-slide="next">
+                    <span className="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
+                    <span className="visually-hidden">Next</span>
+                </button>
             </div >
-            <button className="carousel-control-prev" type="button" data-bs-target="#similarFilms" data-bs-slide="prev">
-                <span className="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
-                <span className="visually-hidden">Previous</span>
-            </button>
-            <button className="carousel-control-next" type="button" data-bs-target="#similarFilms" data-bs-slide="next">
-                <span className="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
-                <span className="visually-hidden">Next</span>
-            </button>
-        </div >
+        </div>
     )
 }
 
