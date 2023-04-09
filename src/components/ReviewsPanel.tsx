@@ -8,6 +8,7 @@ const ReviewsPanel = (props: any) => {
     const [errorMessage, setErrorMessage] = React.useState("")
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [loading, setLoading] = React.useState(true)
+    const [expanded, setExpanded] = React.useState(false);
 
 
     React.useEffect(() => {
@@ -40,6 +41,19 @@ const ReviewsPanel = (props: any) => {
         getReviews()
     }, [props.filmId])
 
+
+    React.useEffect(() => {
+        // Re-renders drop down to update button text arrow direction
+        return;
+
+    }, [expanded])
+
+
+    const toggleExpanded = () => {
+        setExpanded(!expanded);
+    }
+
+
     const display_reviews = () => {
         return reviews.map((review, index) =>
             <div key={review.reviewerId} className={'d-flex flex-column border-bottom border-3 col-12 ' + ((index % 2 === 0) ? 'bg-body' : 'bg-light')}>
@@ -63,16 +77,18 @@ const ReviewsPanel = (props: any) => {
 
     return (
         <div className="d-flex flex-column col-12">
-            <div className='d-flex flex-row bg-light border justify-content-between align-items-center py-2 px-3 rounded-top'>
-                <span className='fs-3'>User Reviews</span>
+            <a onClick={toggleExpanded} className='d-flex flex-row bg-light border justify-content-between align-items-center py-2 px-3 rounded-top text-reset text-decoration-none' data-bs-toggle="collapse" href="#userReviews" role="button" aria-expanded="false" aria-controls="userReviews">
+                <span className='fs-3'> <i className={'bi bi-caret-' + ((expanded) ? 'down' : 'right')}></i> User Reviews</span>
                 <div className='d-flex flex-column'>
                     <span className='fs-6 fw-light'><span className='fs-3 fw-semibold pe-1'>{props.rating}</span>/ 10</span>
                     <span className='text-muted fs-6'>{reviews.length} review{(reviews.length !== 1) ? 's' : ''}</span>
                 </div>
-            </div>
+            </a>
 
-            <div className='d-flex flex-column col-12 border'>
-                {(reviews.length) ? display_reviews() : no_reviews()}
+            <div className='collapse' id='userReviews'>
+                <div className='d-flex flex-column col-12 border collapse'>
+                    {(reviews.length) ? display_reviews() : no_reviews()}
+                </div>
             </div>
         </div>
     )
