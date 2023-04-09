@@ -179,14 +179,14 @@ const ViewFilm = (props: any) => {
     }
 
     return (
-        <div className="d-flex flex-column align-items-start align-items-sm-center p-4">
+        <div className="d-flex flex-column align-items-start align-items-sm-center p-4 placeholder-glow">
             {(timedOut) ? error_timed_out() : ''}
             {(errorFlag) ? error_unexpected() : ''}
             <h1 className='fs-1 text-secondary align-self-center mb-3'>{film.title}</h1>
             <div className='d-flex flex-column col-12 flex-lg-row flex-xxl-column align-items-center justify-content-lg-between justify-content-xxl-center'>
                 <div className='d-flex flex-column col-12 col-sm-10 col-lg-4 col-xxl-3 mb-3 align-items-center me-xxl-5'>
                     <div className='d-flex flex-column align-self-center col-sm-10 col-lg-12 mb-3 mb-sm-0'>
-                        <img className='img-fluid img-thumbnail' src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
+                        <img className={'img-fluid img-thumbnail ' + ((!heroImageLoaded) ? 'placeholder' : '')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
                     </div>
                 </div>
                 <div className='d-flex flex-column flex-sm-row-reverse flex-lg-column flex-xxl-row-reverse col-12 col-lg-7 col-xxl-12 justify-content-sm-around justify-content-xxl-center align-items-center m-sm-3 mt-lg-0'>
