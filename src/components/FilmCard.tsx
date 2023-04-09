@@ -47,10 +47,10 @@ const FilmCard = (props: any) => {
                 <img className={'w-100 h-100 ' + (heroImageLoaded ? '' : 'invisible')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Hero" style={{ boxSizing: 'border-box' }} />
             </div>
 
-            <div className="card-body d-flex flex-column justify-content-around col-lg-7 col-xl-3">
+            <div className="card-body d-flex flex-column justify-content-around align-items-center col-lg-7 col-xl-3">
                 <h5 className="card-title display">{props.film.title}</h5>
 
-                <div className="d-flex flex-column flex-md-row justify-content-around p-2">
+                <div className="d-flex flex-column flex-md-row justify-content-around p-2 mb-2">
                     <div className="d-flex flex-column mb-3">
                         <div className="mb-3">
                             <p className="card-text mb-1 fw-bold">Age Rating</p>
@@ -76,10 +76,10 @@ const FilmCard = (props: any) => {
                     </div>
                 </div>
 
-                <hr />
 
-                <DirectorCard director={{ id: props.film.directorId, firstName: props.film.directorFirstName, lastName: props.film.directorLastName }} />
-
+                <div className="border-top col-8 col-sm-10">
+                    <DirectorCard director={{ id: props.film.directorId, firstName: props.film.directorFirstName, lastName: props.film.directorLastName }} />
+                </div>
             </div>
 
         </a >
