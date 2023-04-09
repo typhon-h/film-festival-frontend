@@ -1,7 +1,7 @@
 import DirectorCardPlaceholder from "../../components/placeholder/DirectorCardPlaceholder"
 import ReviewsPanelPlaceholder from "../../components/placeholder/ReviewsPanelPlaceholder"
 
-const ViewFilm = (props: any) => {
+const ViewFilmPlaceholder = (props: any) => {
 
     const film_details = () => {
         return (
@@ -68,4 +68,4 @@ const ViewFilm = (props: any) => {
 
 }
 
-export default ViewFilm
+export default ViewFilmPlaceholder
