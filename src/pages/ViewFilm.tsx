@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom"
 import default_film_picture from "../assets/default_film_picture.png";
 import { Buffer } from "buffer";
 import ReviewsPanel from "../components/ReviewsPanel"
+import ViewFilmPlaceholder from "./placeholder/ViewFilmPlaceholder"
 
 
 
@@ -20,6 +21,23 @@ const ViewFilm = (props: any) => {
     const [heroImage, setHeroImage] = React.useState<string>("");
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
+    const [isOnline, setIsOnline] = React.useState(navigator.onLine)
+
+
+    // Handler modified to only 'trigger' on the change from offline>online to preserve page content
+    React.useEffect(() => {
+        const handleStatusChange = () => {
+            setIsOnline(navigator.onLine);
+            setLoading(true);
+        };
+
+        window.addEventListener("online", handleStatusChange)
+
+        return () => {
+            window.removeEventListener('online', handleStatusChange);
+        }
+    }, [isOnline])
+
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
@@ -49,7 +67,7 @@ const ViewFilm = (props: any) => {
         }
 
         getFilm()
-    }, [filmId])
+    }, [filmId, isOnline])
 
     React.useEffect(() => {
         const getGenre = () => {
@@ -79,7 +97,7 @@ const ViewFilm = (props: any) => {
         }
 
         getHeroImage()
-    }, [filmId])
+    }, [filmId, isOnline])
 
     const formatRuntime = (runtime: number) => {
         return ((runtime < 60) ? `${runtime}m` : `${Math.floor(runtime / 60)}h ${runtime % 60}m`)
@@ -111,12 +129,59 @@ const ViewFilm = (props: any) => {
         )
     }
 
+
+    const error_offline = () => {
+        return (
+            <div className="alert alert-danger" role="alert">
+                We are having trouble connecting to the internet. Check your network settings or click <a href={window.location.href} className="alert-link">here</a> to try again.
+            </div>
+        )
+    }
+
+    const error_timed_out = () => {
+        return (
+            <div className="alert alert-warning" role="alert">
+                Slow network connection. Please check your network or wait while we process your request
+            </div>
+        )
+    }
+
+    const error_unexpected = () => {
+        return (
+            <div className="alert alert-danger" role="alert">
+                {errorMessage}
+            </div>
+        )
+    }
+
+    if (!isOnline) {
+        console.log('offline trigger')
+        return (
+            <div className="d-flex flex-column">
+                {error_offline()}
+                {<ViewFilmPlaceholder />}
+            </div>
+        )
+    }
+
+    if (loading) {
+        return (
+            <div className="d-flex flex-column">
+                {(timedOut) ? error_timed_out() : ''}
+                {(errorFlag) ? error_unexpected() : ''}
+                {<ViewFilmPlaceholder />}
+            </div>
+        )
+    }
+
     if (!film) {
         return (<NotFound />)
     }
 
     return (
         <div className="d-flex flex-column align-items-start align-items-sm-center p-4">
+            {(timedOut) ? error_timed_out() : ''}
+            {(errorFlag) ? error_unexpected() : ''}
             <h1 className='fs-1 text-secondary align-self-center mb-3'>{film.title}</h1>
             <div className='d-flex flex-column col-12 flex-lg-row flex-xxl-column align-items-center justify-content-lg-between justify-content-xxl-center'>
                 <div className='d-flex flex-column col-12 col-sm-10 col-lg-4 col-xxl-3 mb-3 align-items-center me-xxl-5'>

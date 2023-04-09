@@ -7,7 +7,6 @@ const ReviewsPanel = (props: any) => {
     const [timedOut, setTimedOut] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [errorFlag, setErrorFlag] = React.useState(false)
-    const [loading, setLoading] = React.useState(true)
     const [expanded, setExpanded] = React.useState(false);
 
 
@@ -21,15 +20,15 @@ const ReviewsPanel = (props: any) => {
                 .then((response) => {
                     setErrorFlag(false)
                     setReviews(response.data)
-                    setLoading(false)
                     clearTimeout(timer)
                     setTimedOut(false)
                 }, (error) => {
                     console.log(error)
+                    setErrorFlag(true)
 
                     if (error.code !== "ERR_NETWORK") {
-                        setErrorFlag(true)
-                        setErrorMessage(error.response.statusText)
+
+                        setErrorMessage("An error occurred while fetching reviews. Please refresh the page")
                     }
 
                     clearTimeout(timer)
@@ -69,11 +68,27 @@ const ReviewsPanel = (props: any) => {
         )
     }
 
-    const no_reviews = () => {
-        return (
-            <span className="text-muted fst-italic">No Reviews Available</span>
-        )
+    const render_reviews = () => {
+
+        if (timedOut) { // Should never get here, slow network will be monitored at page level
+            return (
+                <div className="spinner-border" role="status">
+                    <span className="sr-only">Loading...</span>
+                </div>
+            )
+        } else if (errorFlag) {
+            return (
+                <span className="text-muted fst-italic">{errorMessage}</span>
+            )
+        } else if (reviews.length === 0) {
+            return (
+                <span className="text-muted fst-italic">No Reviews Available</span>
+            )
+        } else {
+            return display_reviews()
+        }
     }
+
 
     return (
         <div className="d-flex flex-column col-12">
@@ -87,7 +102,7 @@ const ReviewsPanel = (props: any) => {
 
             <div className='collapse' id='userReviews'>
                 <div className='d-flex flex-column col-12 border collapse'>
-                    {(reviews.length) ? display_reviews() : no_reviews()}
+                    {render_reviews()}
                 </div>
             </div>
         </div>
