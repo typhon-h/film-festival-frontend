@@ -60,7 +60,7 @@ const ReviewsPanel = (props: any) => {
                 {(review.review) ? <span className='w-100 p-2 fs-6 fst-italic text-start border-1 border-bottom'>"{review.review}"</span> : ''}
                 <div className='d-flex flex-row justify-content-between align-items-center py-2 px-4'>
                     <span className='col-3 fs-6 text-muted'><span className='fs-1 fw-medium pe-1 text-dark'>{review.rating}</span>/ 10</span>
-                    <div className='col-5 border-1'>
+                    <div className='col-8 col-sm-5 col-lg-3 border-1'>
                         <DirectorCard director={{ id: review.reviewerId, firstName: review.reviewerFirstName, lastName: review.reviewerLastName }}></DirectorCard>
                     </div>
                 </div>
