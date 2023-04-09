@@ -4,3 +4,6 @@ View Films
 
  Filter Films
     - Cannot adjust filter criteria while films loading
+
+View Film
+   - Cannot see date on review to verify sort
