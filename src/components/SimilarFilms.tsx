@@ -71,11 +71,11 @@ const SimilarFilms = (props: any) => {
 
             </div >
             <button className="carousel-control-prev" type="button" data-bs-target="#similarFilms" data-bs-slide="prev">
-                <span className="carousel-control-prev-icon bg-dark" aria-hidden="true"></span>
+                <span className="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
                 <span className="visually-hidden">Previous</span>
             </button>
             <button className="carousel-control-next" type="button" data-bs-target="#similarFilms" data-bs-slide="next">
-                <span className="carousel-control-next-icon bg-dark" aria-hidden="true"></span>
+                <span className="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
                 <span className="visually-hidden">Next</span>
             </button>
         </div >
