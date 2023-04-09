@@ -5,6 +5,7 @@ import NotFound from "./NotFound"
 import { useParams } from "react-router-dom"
 import default_film_picture from "../assets/default_film_picture.png";
 import { Buffer } from "buffer";
+import ReviewsPanel from "../components/ReviewsPanel"
 
 
 
@@ -80,6 +81,10 @@ const ViewFilm = (props: any) => {
         getHeroImage()
     }, [filmId])
 
+    const formatRuntime = (runtime: number) => {
+        return ((runtime < 60) ? `${runtime}m` : `${Math.floor(runtime / 60)}h ${runtime % 60}m`)
+    }
+
     if (!film) {
         return (<NotFound />)
     }
@@ -93,7 +98,9 @@ const ViewFilm = (props: any) => {
             <p className="d-inline-block w-100 text-dark text-start text-wrap text-break"><b>Description: </b>{film.description}</p>
             <div className='d-flex flex-column w-100'>
                 <p className='align-self-start fw-bold'>Director:</p>
-                <DirectorCard director={{ id: film.directorId, firstName: film.directorFirstName, lastName: film.directorLastName }} />
+                <div className='bg-light rounded-3 px-5'>
+                    <DirectorCard director={{ id: film.directorId, firstName: film.directorFirstName, lastName: film.directorLastName }} />
+                </div>
             </div>
 
             <div className='d-flex flex-column bg-light w-100 border rounded-3 p-3 my-3'>
@@ -109,7 +116,7 @@ const ViewFilm = (props: any) => {
                     </div>
                     <div className='d-flex flex-row justify-content-between'>
                         <p className='col-5 text-end'>Runtime:</p>
-                        <p className='col-5 text-start'>{film.runtime}</p>
+                        <p className='col-5 text-start'>{formatRuntime(film.runtime)}</p>
                     </div>
                     <div className='d-flex flex-row justify-content-between'>
                         <p className='col-5 text-end'>Release Date:</p>
@@ -118,7 +125,7 @@ const ViewFilm = (props: any) => {
                 </div>
             </div>
 
-            <div className='w-100 d-flex flex-column'><span className='col-12 bg-warning'>REVIEWS</span></div>
+            <ReviewsPanel filmId={filmId} rating={film.rating} />
 
         </div >
     )
