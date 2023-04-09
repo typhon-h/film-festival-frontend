@@ -28,13 +28,15 @@ const ViewFilm = (props: any) => {
     React.useEffect(() => {
         const handleStatusChange = () => {
             setIsOnline(navigator.onLine);
-            setLoading(true);
         };
 
         window.addEventListener("online", handleStatusChange)
+        window.addEventListener("offline", handleStatusChange)
 
         return () => {
             window.removeEventListener('online', handleStatusChange);
+            window.removeEventListener('offline', handleStatusChange);
+
         }
     }, [isOnline])
 
@@ -95,9 +97,10 @@ const ViewFilm = (props: any) => {
                     setHeroImageLoaded(true);
                 })
         }
-
-        getHeroImage()
-    }, [filmId, isOnline])
+        if (loading) {
+            getHeroImage()
+        }
+    }, [filmId, isOnline, loading])
 
     const formatRuntime = (runtime: number) => {
         return ((runtime < 60) ? `${runtime}m` : `${Math.floor(runtime / 60)}h ${runtime % 60}m`)
@@ -154,8 +157,7 @@ const ViewFilm = (props: any) => {
         )
     }
 
-    if (!isOnline) {
-        console.log('offline trigger')
+    if (!isOnline && loading) {
         return (
             <div className="d-flex flex-column">
                 {error_offline()}
