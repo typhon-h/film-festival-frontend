@@ -61,7 +61,7 @@ const FilmCard = (props: any) => {
 
                         <div>
                             <p className="card-text mb-1 fw-bold">Avg. Rating</p>
-                            <p className="card-text">{props.film.rating ? props.film.rating : 'N/A'}</p>
+                            <p className="card-text">{props.film.rating}</p>
                         </div>
                     </div>
 
