@@ -11,7 +11,7 @@ const Register = () => {
     const [emailError, setEmailError] = React.useState<string>("Please enter a valid email")
     const [newUserImage, setNewUserImage] = React.useState<string>("")
     const [active, setActive] = React.useState({ userId: 0, token: '' })
-
+    const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
 
     const form = React.useRef<HTMLFormElement>(null)
     const firstName = React.useRef<HTMLInputElement>(null)
@@ -183,7 +183,17 @@ const Register = () => {
                         <label htmlFor="registerPassword" className="form-label">Password</label>
                         <span className='fs-6 text-muted'>required</span>
                     </div>
-                    <input ref={password} type="password" className="form-control" id="registerPassword" minLength={6} maxLength={64} required />
+
+                    <div className="d-flex flex-row col-12 input-group mb-3">
+                        <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="registerPassword" minLength={6} maxLength={64} required />
+                        <button className="btn btn-outline-secondary" type="button" id="showPassword" onClick={() => { setPasswordVisible(!passwordVisible) }}><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                    </div>
+
+
+
+
+
+
                     <div className="valid-feedback text-end">
                         Great!
                     </div>
@@ -209,7 +219,7 @@ const Register = () => {
                     <button type="reset" className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5">Clear</button>
                     <button onClick={validate} type="button" className="btn btn-primary col-12 col-lg-5">Submit</button>
                 </div>
-            </form>
+            </form >
         </div >
     )
 }
