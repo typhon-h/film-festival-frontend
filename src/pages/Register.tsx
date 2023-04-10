@@ -3,12 +3,15 @@ import React from "react"
 import { useNavigate } from "react-router-dom";
 import default_profile_picture from "../assets/default_profile_picture"
 import { getBase64 } from "../util/Image";
+import { login } from "../util/Authentication";
 
 const Register = () => {
     const navigate = useNavigate();
     const [submitted, setSubmitted] = React.useState<boolean>(false)
     const [emailError, setEmailError] = React.useState<string>("Please enter a valid email")
     const [newUserImage, setNewUserImage] = React.useState<string>("")
+    const [active, setActive] = React.useState({ userId: 0, token: '' })
+
 
     const form = React.useRef<HTMLFormElement>(null)
     const firstName = React.useRef<HTMLInputElement>(null)
@@ -36,17 +39,19 @@ const Register = () => {
         if (!form.current?.checkValidity()) {
             form.current?.classList.add('was-validated')
             setEmailError('Please enter a valid email')
+            setSubmitted(false)
         } else {
             form.current?.classList.remove('was-validated')
             if (image.current?.files?.item(0)) {
                 getBase64(image.current.files.item(0) as File, (str64) => {
                     setNewUserImage(str64)
+                    setSubmitted(true)
                 })
             } else {
-                console.log(default_profile_picture)
                 setNewUserImage(default_profile_picture)
+                setSubmitted(true)
             }
-            setSubmitted(true)
+
         }
     }
 
@@ -65,9 +70,7 @@ const Register = () => {
                     password: password.current?.value
                 }
             ).then((response) => {
-                // login
-                postImage(response.data.userId)
-                // navigate('/')
+                login(email.current?.value as string, password.current?.value as string, setActive)
             }, (err) => {
                 console.log(err)
                 setSubmitted(false)
@@ -89,17 +92,6 @@ const Register = () => {
             })
         }
 
-        const postImage = (id: number) => {
-            axios.put(process.env.REACT_APP_DOMAIN + `/users/${id}/image`,
-                newUserImage)
-                .then((response) => {
-                    navigate('/')
-                }, (err) => { //TODO: server side error handling
-                    console.log(err)
-                })
-        }
-
-
         if (!(newUserImage.startsWith('data:image/png') || newUserImage.startsWith('data:image/gif') || newUserImage.startsWith('data:image/jpg') || newUserImage.startsWith('data:image/jpeg'))) {
             image.current?.classList.add('is-invalid');
             setSubmitted(false)
@@ -111,10 +103,29 @@ const Register = () => {
 
         register()
 
+    }, [submitted, newUserImage])
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [submitted])
+    React.useEffect(() => {
+        if (!submitted) {
+            return
+        }
+        const postImage = (id: number) => {
+            axios.put(process.env.REACT_APP_DOMAIN + `/users/${id}/image`,
+                newUserImage, {
+                headers: {
+                    'Content-Type': newUserImage.split(';')[0].replace('data:', '')
+                }
+            })
+                .then((response) => {
+                    navigate('/')
+                }, (err) => { //TODO: server side error handling
+                    console.log(err)
+                })
+        }
 
+        postImage(active.userId)
+
+    }, [active, navigate, newUserImage, submitted])
 
     return (
 
