@@ -176,7 +176,7 @@ const FilmView = (props: any) => {
 
             {(isSearch) ? search_title() : default_title()}
 
-            <div className={'d-flex flex-column-reverse flex-md-row align-items-end align-items-md-start justify-content-between mx-5 mb-2 ' + ((films.length === 0) ? 'd-none' : '')}>
+            <div className={'d-flex flex-column-reverse flex-md-row align-items-end align-items-md-start justify-content-between mx-5 mb-2'}>
                 <Sort updateParams={setSearchParams} />
                 <Filters updateParams={setSearchParams} />
             </div>
