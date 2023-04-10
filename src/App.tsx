@@ -8,46 +8,32 @@ import ViewFilm from './pages/ViewFilm';
 import SimilarFilms from './components/SimilarFilms';
 import Home from './pages/Home';
 import Register from './pages/Register';
+import ScrollToTop from './components/ScrollToTop';
+import { AuthContext } from './util/Contexts';
+import Protected from './layouts/Protected';
 
 function App() {
-  const scrollButton = React.useRef<HTMLDivElement>(null)
-
-
-  const toggle_return_to_top = () => {
-    if (scrollButton.current) {
-      if (document.documentElement.scrollTop > 50 || document.body.scrollTop > 50) {
-        scrollButton.current.style.display = "flex";
-      } else {
-        scrollButton.current.style.display = "none";
-      }
-    }
-  }
-
-  window.addEventListener("scroll", toggle_return_to_top)
-
+  const [activeUser, setActiveUser] = React.useState<number>(0)
 
   return (
     <div className="App">
       <Router>
-        <Main>
-          <div style={{ minHeight: '85vh' }}>
-            <Routes>
-              <Route path="/" element={<Home />}></Route>
-              <Route path="/home" element={<Home />}></Route>
-              <Route path="/register" element={<Register />}></Route>
-              <Route path="/films" element={<ViewFilms />}></Route>
-              <Route path="/films/:filmId" element={<ViewFilm />}></Route>
-              <Route path="/component/test" element={<SimilarFilms filmId={1} directorId={2} genreId={2} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-
-          {/* Return to top button */}
-          <div ref={scrollButton} className='justify-content-center fixed-bottom m-4 m-md-5' style={{ display: 'none', left: 'auto' }}>
-
-            <span role={'button'} onClick={() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }} className='fs-1 text-info p-0'><i className="bi bi-arrow-up-circle-fill "></i></span>
-          </div>
-        </Main>
+        <AuthContext.Provider value={[activeUser, setActiveUser]}>
+          <Main>
+            <div style={{ minHeight: '85vh' }}>
+              <Routes>
+                <Route path="/" element={<Home />}></Route>
+                <Route path="/home" element={<Home />}></Route>
+                <Route path="/register" element={<Protected auth={false}><Register /></Protected>}></Route>
+                <Route path="/films" element={<ViewFilms />}></Route>
+                <Route path="/films/:filmId" element={<ViewFilm />}></Route>
+                <Route path="/component/test" element={<SimilarFilms filmId={1} directorId={2} genreId={2} />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+            <ScrollToTop />
+          </Main>
+        </AuthContext.Provider>
       </Router>
     </div >
   );
