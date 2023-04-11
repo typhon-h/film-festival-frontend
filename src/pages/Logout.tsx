@@ -22,7 +22,17 @@ const Logout = () => {
                     navigate('/')
                 }, (err) => {
                     console.log(err)
-                    setErrorFlag(true)
+                    if (err.response.status === 401) {
+                        setActiveUser(null)
+                        sessionStorage.removeItem('activeUser')
+                        sessionStorage.removeItem('token')
+                        axios.defaults.headers.common = {
+                            'x-authorization': ''
+                        }
+                        navigate('/')
+                    } else {
+                        setErrorFlag(true)
+                    }
                 })
         }
 
