@@ -24,7 +24,7 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <AuthContext.Provider value={[activeUser, setActiveUser]}>
+        <AuthContext.Provider value={React.useMemo(() => [activeUser, setActiveUser], [activeUser, setActiveUser])}>
           <Main>
             <div style={{ minHeight: '85vh' }}>
               <Routes>
