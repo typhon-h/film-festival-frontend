@@ -3,15 +3,17 @@ import React from "react"
 import { useNavigate } from "react-router-dom";
 import default_profile_picture from "../assets/default_profile_picture"
 import { getBase64 } from "../util/Image";
-import { login } from "../util/Authentication";
+import { login } from "./Login";
+import { AuthContext } from "../util/Contexts";
 
 const Register = () => {
     const navigate = useNavigate();
     const [submitted, setSubmitted] = React.useState<boolean>(false)
     const [emailError, setEmailError] = React.useState<string>("Please enter a valid email")
     const [newUserImage, setNewUserImage] = React.useState<string>("")
-    const [active, setActive] = React.useState({ userId: 0, token: '' })
     const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
+    const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
+    const [activeUser, setActiveUser] = React.useContext(AuthContext)
 
     const form = React.useRef<HTMLFormElement>(null)
     const firstName = React.useRef<HTMLInputElement>(null)
@@ -71,7 +73,19 @@ const Register = () => {
                     password: password.current?.value
                 }
             ).then((response) => {
-                login(email.current?.value as string, password.current?.value as string, setActive)
+                login(email.current?.value as string, password.current?.value as string,
+                    (response) => {
+                        setActiveUser(response.data.userId)
+                        axios.defaults.headers.common = {
+                            'x-authorization': response.data.token
+                        }
+                        sessionStorage.setItem('activeUser', response.data.userId)
+                        sessionStorage.setItem('token', response.data.token)
+                    }, (err) => {
+                        console.log(err)
+                        setSubmitted(false)
+                        setErrorFlag(true)
+                    })
             }, (err) => {
                 console.log(err)
                 setSubmitted(false)
@@ -104,7 +118,7 @@ const Register = () => {
 
         register()
 
-    }, [submitted, newUserImage])
+    }, [submitted, newUserImage, setActiveUser])
 
     React.useEffect(() => {
         if (!submitted) {
@@ -118,21 +132,31 @@ const Register = () => {
                 }
             })
                 .then((response) => {
-                    navigate('/')
-                }, (err) => { //TODO: server side error handling
+                    navigate('/') // TODO: redirect to profile page
+                }, (err) => { //TODO: Ask Morgan about clean way to handle this error
                     console.log(err)
                 })
         }
 
-        postImage(active.userId)
+        postImage(activeUser)
 
-    }, [active, navigate, newUserImage, submitted])
+    }, [activeUser, navigate, newUserImage, submitted])
 
     return (
 
         <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100' >
+            {(errorFlag) ?
+                <div className="alert alert-danger" role="alert">
+                    An unexpected error occurred. Please try again
+                </div>
+                : ''
+            }
 
-            <h1 className="mb-5">Register</h1>
+            <div className='mb-3'>
+                <h1>Register</h1>
+                <span className='text-secondary'>Already registered? <a href='/login' className="text-primary text-decoration-none">Log in</a></span>
+            </div>
+
             <form ref={form} className='d-flex flex-column col-10 col-md-6 ' onSubmit={validate} id='registerForm' noValidate>
 
                 <div className="d-flex flex-column flex-lg-row align-items-start justify-content-lg-between">
