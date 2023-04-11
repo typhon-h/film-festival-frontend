@@ -10,3 +10,9 @@ View Film
 
 Similar Films
    - No message if no similar films
+
+Register
+   - Email validation not same on front as in api
+
+Login
+   - No error handling if image upload fails (just fails quietly but frontend handles 404s anyway)
