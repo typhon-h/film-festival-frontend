@@ -80,8 +80,8 @@ const Register = () => {
                         axios.defaults.headers.common = {
                             'x-authorization': response.data.token
                         }
-                        sessionStorage.setItem('activeUser', response.data.userId)
-                        sessionStorage.setItem('token', response.data.token)
+                        localStorage.setItem('activeUser', response.data.userId)
+                        localStorage.setItem('token', response.data.token)
                     }, (err) => {
                         console.log(err)
                         setSubmitted(false)

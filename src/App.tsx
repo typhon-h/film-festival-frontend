@@ -17,9 +17,9 @@ import Logout from './pages/Logout';
 import CreateFilm from './pages/CreateFilm';
 
 function App() {
-  const [activeUser, setActiveUser] = React.useState<number>(sessionStorage.getItem('activeUser') as unknown as number)
+  const [activeUser, setActiveUser] = React.useState<number>(localStorage.getItem('activeUser') as unknown as number)
   axios.defaults.headers.common = {
-    'x-authorization': sessionStorage.getItem('token')
+    'x-authorization': localStorage.getItem('token')
   }
 
   return (

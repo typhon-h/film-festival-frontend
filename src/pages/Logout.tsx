@@ -14,8 +14,8 @@ const Logout = () => {
             axios.post(process.env.REACT_APP_DOMAIN + "/users/logout")
                 .then((response) => {
                     setActiveUser(null)
-                    sessionStorage.removeItem('activeUser')
-                    sessionStorage.removeItem('token')
+                    localStorage.removeItem('activeUser')
+                    localStorage.removeItem('token')
                     axios.defaults.headers.common = {
                         'x-authorization': ''
                     }
@@ -24,8 +24,8 @@ const Logout = () => {
                     console.log(err)
                     if (err.response.status === 401) {
                         setActiveUser(null)
-                        sessionStorage.removeItem('activeUser')
-                        sessionStorage.removeItem('token')
+                        localStorage.removeItem('activeUser')
+                        localStorage.removeItem('token')
                         axios.defaults.headers.common = {
                             'x-authorization': ''
                         }
