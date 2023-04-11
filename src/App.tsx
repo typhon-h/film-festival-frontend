@@ -12,9 +12,13 @@ import ScrollToTop from './components/ScrollToTop';
 import { AuthContext } from './util/Contexts';
 import Protected from './layouts/Protected';
 import Login from './pages/Login';
+import axios from 'axios';
 
 function App() {
-  const [activeUser, setActiveUser] = React.useState<number>(0)
+  const [activeUser, setActiveUser] = React.useState<number>(sessionStorage.getItem('activeUser') as unknown as number)
+  axios.defaults.headers.common = {
+    'x-authorization': sessionStorage.getItem('token')
+  }
 
   return (
     <div className="App">
