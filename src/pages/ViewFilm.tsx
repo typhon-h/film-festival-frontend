@@ -122,7 +122,7 @@ const ViewFilm = (props: any) => {
                     </div>
                     <div className='d-flex flex-row justify-content-between'>
                         <p className='col-5 text-end'>Runtime:</p>
-                        <p className='col-5 text-start'>{formatRuntime(film.runtime)}</p>
+                        <p className='col-5 text-start'>{(film.runtime) ? formatRuntime(film.runtime) : 'Not Available'}</p>
                     </div>
                     <div className='d-flex flex-row justify-content-between'>
                         <p className='col-5 text-end'>Release Date:</p>
