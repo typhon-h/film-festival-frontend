@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import ScrollToTop from './components/ScrollToTop';
 import { AuthContext } from './util/Contexts';
 import Protected from './layouts/Protected';
+import Login from './pages/Login';
 
 function App() {
   const [activeUser, setActiveUser] = React.useState<number>(0)
@@ -22,11 +23,12 @@ function App() {
           <Main>
             <div style={{ minHeight: '85vh' }}>
               <Routes>
-                <Route path="/" element={<Home />}></Route>
-                <Route path="/home" element={<Home />}></Route>
-                <Route path="/register" element={<Protected auth={false}><Register /></Protected>}></Route>
-                <Route path="/films" element={<ViewFilms />}></Route>
-                <Route path="/films/:filmId" element={<ViewFilm />}></Route>
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/register" element={<Protected auth={false}><Register /></Protected>} />
+                <Route path="/login" element={<Protected auth={false}><Login /></Protected>} />
+                <Route path="/films" element={<ViewFilms />} />
+                <Route path="/films/:filmId" element={<ViewFilm />} />
                 <Route path="/component/test" element={<SimilarFilms filmId={1} directorId={2} genreId={2} />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
