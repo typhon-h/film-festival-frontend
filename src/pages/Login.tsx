@@ -15,6 +15,7 @@ const login = (email: string | undefined, password: string | undefined, success:
 const Login = () => {
     const [, setActiveUser] = React.useContext(AuthContext)
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
+    const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
     const [submitted, setSubmitted] = React.useState<boolean>(false)
 
     const form = React.useRef<HTMLFormElement>(null)
@@ -58,13 +59,24 @@ const Login = () => {
             }, (err) => {
                 console.log(err)
                 setSubmitted(false)
-                setErrorFlag(true)
+                if (err.code === 'ERR_NETWORK') {
+                    setConnectionFlag(true)
+                    setErrorFlag(false)
+                } else {
+                    setConnectionFlag(false)
+                    setErrorFlag(true)
+                }
             })
 
     }, [setActiveUser, submitted])
 
     return (
         <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100'>
+            {(connectionFlag) ?
+                <div className="alert alert-danger" role="alert">
+                    Unable to connect to the internet. Please try again
+                </div>
+                : ''}
             <div className='mb-3'>
                 <h1>Login</h1>
                 <span className='text-secondary'>Not registered? <a href='/register' className="text-primary text-decoration-none">Create a new account</a></span>

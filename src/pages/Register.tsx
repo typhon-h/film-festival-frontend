@@ -13,6 +13,7 @@ const Register = () => {
     const [newUserImage, setNewUserImage] = React.useState<string>("")
     const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
+    const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
     const [activeUser, setActiveUser] = React.useContext(AuthContext)
 
     const form = React.useRef<HTMLFormElement>(null)
@@ -84,11 +85,22 @@ const Register = () => {
                     }, (err) => {
                         console.log(err)
                         setSubmitted(false)
-                        setErrorFlag(true)
+                        if (err.code === 'ERR_NETWORK') {
+                            setConnectionFlag(true)
+                            setErrorFlag(false)
+                        } else {
+                            setConnectionFlag(false)
+                            setErrorFlag(true)
+                        }
                     })
             }, (err) => {
                 console.log(err)
                 setSubmitted(false)
+
+                if (err.code === 'ERR_NETWORK') {
+                    setConnectionFlag(true)
+                    return
+                }
 
                 switch (err.response.status) {
                     case 403:
@@ -135,6 +147,11 @@ const Register = () => {
                     navigate('/') // TODO: redirect to profile page
                 }, (err) => { //TODO: Ask Morgan about clean way to handle this error
                     console.log(err)
+
+                    if (err.code === 'ERR_NETWORK') {
+                        setConnectionFlag(true)
+                        return
+                    }
                 })
         }
 
@@ -143,8 +160,7 @@ const Register = () => {
     }, [activeUser, navigate, newUserImage, submitted])
 
     return (
-
-        <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100' >
+        <div>
             {(errorFlag) ?
                 <div className="alert alert-danger" role="alert">
                     An unexpected error occurred. Please try again
@@ -152,96 +168,105 @@ const Register = () => {
                 : ''
             }
 
-            <div className='mb-3'>
-                <h1>Register</h1>
-                <span className='text-secondary'>Already registered? <a href='/login' className="text-primary text-decoration-none">Log in</a></span>
-            </div>
+            {(connectionFlag) ?
+                <div className="alert alert-danger" role="alert">
+                    Unable to connect to the internet. Please try again
+                </div>
+                : ''}
 
-            <form ref={form} className='d-flex flex-column col-10 col-md-6 ' onSubmit={validate} id='registerForm' noValidate>
+            <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100' >
 
-                <div className="d-flex flex-column flex-lg-row align-items-start justify-content-lg-between">
-                    <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
-                        <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="registerFName" className="form-label">First Name</label>
-                            <span className='fs-6 text-muted'>required</span>
-                        </div>
-                        <input ref={firstName} type="text" className="form-control" id="registerFName" maxLength={64} placeholder={'Jane'} aria-describedby={'registerFNameInvalid'} autoFocus={true} required />
-                        <div className="valid-feedback text-end">
-                            Great!
-                        </div>
-                        <div className="invalid-feedback text-end" id='registerFNameInvalid'>
-                            Please enter a valid first name less than 64 characters
-                        </div>
+                <div className='mb-3'>
+                    <h1>Register</h1>
+                    <span className='text-secondary'>Already registered? <a href='/login' className="text-primary text-decoration-none">Log in</a></span>
+                </div>
 
+                <form ref={form} className='d-flex flex-column col-10 col-md-6 ' onSubmit={validate} id='registerForm' noValidate>
+
+                    <div className="d-flex flex-column flex-lg-row align-items-start justify-content-lg-between">
+                        <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
+                            <div className='d-flex flex-row col-12 justify-content-between'>
+                                <label htmlFor="registerFName" className="form-label">First Name</label>
+                                <span className='fs-6 text-muted'>required</span>
+                            </div>
+                            <input ref={firstName} type="text" className="form-control" id="registerFName" maxLength={64} placeholder={'Jane'} aria-describedby={'registerFNameInvalid'} autoFocus={true} required />
+                            <div className="valid-feedback text-end">
+                                Great!
+                            </div>
+                            <div className="invalid-feedback text-end" id='registerFNameInvalid'>
+                                Please enter a valid first name less than 64 characters
+                            </div>
+
+                        </div>
+                        <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
+                            <div className='d-flex flex-row col-12 justify-content-between'>
+                                <label htmlFor="registerLName" className="form-label">Last Name</label>
+                                <span className='fs-6 text-muted'>required</span>
+                            </div>
+                            <input ref={lastName} type="text" className="form-control" id="registerLName" maxLength={64} placeholder={'Doe'} required />
+                            <div className="valid-feedback text-end">
+                                Great!
+                            </div>
+                            <div className="invalid-feedback text-end">
+                                Please enter a valid last name less than 64 characters
+                            </div>
+                        </div>
                     </div>
-                    <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
+
+                    <div className='d-flex flex-column col-12 align-items-start mb-3'>
                         <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="registerLName" className="form-label">Last Name</label>
+                            <label htmlFor="registerEmail" className="form-label">Email</label>
                             <span className='fs-6 text-muted'>required</span>
                         </div>
-                        <input ref={lastName} type="text" className="form-control" id="registerLName" maxLength={64} placeholder={'Doe'} required />
+                        <input ref={email} type="email" className="form-control" id="registerEmail" maxLength={256} placeholder={'jane.doe@email.com'} required />
                         <div className="valid-feedback text-end">
                             Great!
                         </div>
                         <div className="invalid-feedback text-end">
-                            Please enter a valid last name less than 64 characters
+                            {emailError}
                         </div>
                     </div>
-                </div>
 
-                <div className='d-flex flex-column col-12 align-items-start mb-3'>
-                    <div className='d-flex flex-row col-12 justify-content-between'>
-                        <label htmlFor="registerEmail" className="form-label">Email</label>
-                        <span className='fs-6 text-muted'>required</span>
-                    </div>
-                    <input ref={email} type="email" className="form-control" id="registerEmail" maxLength={256} placeholder={'jane.doe@email.com'} required />
-                    <div className="valid-feedback text-end">
-                        Great!
-                    </div>
-                    <div className="invalid-feedback text-end">
-                        {emailError}
-                    </div>
-                </div>
+                    <div className='d-flex flex-column col-12 align-items-start mb-3'>
+                        <div className='d-flex flex-row col-12 justify-content-between'>
+                            <label htmlFor="registerPassword" className="form-label">Password</label>
+                            <span className='fs-6 text-muted'>required</span>
+                        </div>
 
-                <div className='d-flex flex-column col-12 align-items-start mb-3'>
-                    <div className='d-flex flex-row col-12 justify-content-between'>
-                        <label htmlFor="registerPassword" className="form-label">Password</label>
-                        <span className='fs-6 text-muted'>required</span>
+                        <div className="d-flex flex-row col-12 input-group mb-3">
+                            <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="registerPassword" minLength={6} maxLength={64} required />
+                            <button className="btn btn-outline-secondary rounded-end" type="button" id="showPassword" onClick={() => { setPasswordVisible(!passwordVisible) }}><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                            <div className="valid-feedback text-end">
+                                Great!
+                            </div>
+                            <div className="invalid-feedback text-end">
+                                Password must be between 6-64 characters
+                            </div>
+                        </div>
+
+
                     </div>
 
-                    <div className="d-flex flex-row col-12 input-group mb-3">
-                        <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="registerPassword" minLength={6} maxLength={64} required />
-                        <button className="btn btn-outline-secondary rounded-end" type="button" id="showPassword" onClick={() => { setPasswordVisible(!passwordVisible) }}><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                    <div className='d-flex flex-column col-12 align-items-start mb-3'>
+                        <div className='d-flex flex-row col-12 justify-content-between'>
+                            <label htmlFor="registerProfilePicture" className="form-label">Upload Profile Picture</label>
+                            <span className='fs-6 text-muted'>optional</span>
+                        </div>
+                        <input ref={image} type="file" className="form-control" accept="image/png,image/gif,image/jpeg, image/jpg" id="registerProfilePicture" placeholder={'Jane'} />
                         <div className="valid-feedback text-end">
                             Great!
                         </div>
                         <div className="invalid-feedback text-end">
-                            Password must be between 6-64 characters
+                            File must be one of the following: png, gif, jpeg
                         </div>
                     </div>
-
-
-                </div>
-
-                <div className='d-flex flex-column col-12 align-items-start mb-3'>
-                    <div className='d-flex flex-row col-12 justify-content-between'>
-                        <label htmlFor="registerProfilePicture" className="form-label">Upload Profile Picture</label>
-                        <span className='fs-6 text-muted'>optional</span>
+                    <div className="d-flex flex-column flex-lg-row justify-content-between">
+                        <button type="reset" className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5">Clear</button>
+                        <button type="submit" className="btn btn-primary col-12 col-lg-5">Submit</button>
                     </div>
-                    <input ref={image} type="file" className="form-control" accept="image/png,image/gif,image/jpeg, image/jpg" id="registerProfilePicture" placeholder={'Jane'} />
-                    <div className="valid-feedback text-end">
-                        Great!
-                    </div>
-                    <div className="invalid-feedback text-end">
-                        File must be one of the following: png, gif, jpeg
-                    </div>
-                </div>
-                <div className="d-flex flex-column flex-lg-row justify-content-between">
-                    <button type="reset" className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5">Clear</button>
-                    <button type="submit" className="btn btn-primary col-12 col-lg-5">Submit</button>
-                </div>
-            </form >
-        </div >
+                </form >
+            </div >
+        </div>
     )
 }
 
