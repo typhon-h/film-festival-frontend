@@ -20,7 +20,8 @@ const Register = () => {
     const password = React.useRef<HTMLInputElement>(null)
     const image = React.useRef<HTMLInputElement>(null)
 
-    const validate = () => {
+    const validate = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
         firstName.current?.classList.remove('is-valid')
         firstName.current?.classList.remove('is-invalid')
 
@@ -132,7 +133,7 @@ const Register = () => {
         <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100' >
 
             <h1 className="mb-5">Register</h1>
-            <form ref={form} className='d-flex flex-column col-10 col-md-6  ' id='registerForm' noValidate>
+            <form ref={form} className='d-flex flex-column col-10 col-md-6 ' onSubmit={validate} id='registerForm' noValidate>
 
                 <div className="d-flex flex-column flex-lg-row align-items-start justify-content-lg-between">
                     <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
@@ -140,7 +141,7 @@ const Register = () => {
                             <label htmlFor="registerFName" className="form-label">First Name</label>
                             <span className='fs-6 text-muted'>required</span>
                         </div>
-                        <input ref={firstName} type="text" className="form-control" id="registerFName" maxLength={64} placeholder={'Jane'} aria-describedby={'registerFNameInvalid'} required />
+                        <input ref={firstName} type="text" className="form-control" id="registerFName" maxLength={64} placeholder={'Jane'} aria-describedby={'registerFNameInvalid'} autoFocus={true} required />
                         <div className="valid-feedback text-end">
                             Great!
                         </div>
@@ -189,11 +190,6 @@ const Register = () => {
                         <button className="btn btn-outline-secondary" type="button" id="showPassword" onClick={() => { setPasswordVisible(!passwordVisible) }}><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
                     </div>
 
-
-
-
-
-
                     <div className="valid-feedback text-end">
                         Great!
                     </div>
@@ -217,7 +213,7 @@ const Register = () => {
                 </div>
                 <div className="d-flex flex-column flex-lg-row justify-content-between">
                     <button type="reset" className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5">Clear</button>
-                    <button onClick={validate} type="button" className="btn btn-primary col-12 col-lg-5">Submit</button>
+                    <button type="submit" className="btn btn-primary col-12 col-lg-5">Submit</button>
                 </div>
             </form >
         </div >
