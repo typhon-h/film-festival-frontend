@@ -14,6 +14,7 @@ import Protected from './layouts/Protected';
 import Login from './pages/Login';
 import axios from 'axios';
 import Logout from './pages/Logout';
+import CreateFilm from './pages/CreateFilm';
 
 function App() {
   const [activeUser, setActiveUser] = React.useState<number>(sessionStorage.getItem('activeUser') as unknown as number)
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/logout" element={<Protected><Logout /></Protected>} />
                 <Route path="/films" element={<ViewFilms />} />
                 <Route path="/films/:filmId" element={<ViewFilm />} />
+                <Route path="/films/create" element={<Protected><CreateFilm /></Protected>} />
                 <Route path="/component/test" element={<SimilarFilms filmId={1} directorId={2} genreId={2} />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

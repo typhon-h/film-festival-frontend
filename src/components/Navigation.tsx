@@ -13,6 +13,9 @@ const Navigation = () => {
                         <ul className="navbar-nav order-0">
                             <NavLink href={'/'}>Home</NavLink>
                             <NavLink href={'/films'}>Films</NavLink>
+                            <Restricted>
+                                <NavLink href={'/films/create'}>Add Film</NavLink>
+                            </Restricted>
                         </ul>
 
                         <form action="/films" className="d-flex flex-column flex-lg-row form-inline my-2 my-lg-0 col-10 col-lg-5 order-2 order-lg-1">
