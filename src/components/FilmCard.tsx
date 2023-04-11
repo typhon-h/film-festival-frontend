@@ -79,7 +79,8 @@ const FilmCard = (props: any) => {
                 </div>
 
 
-                <div className="border-top col-8 col-sm-10">
+                <div className="border-top col-8 col-sm-10 pt-2">
+                    <span className='fw-bold'>Director</span>
                     <DirectorCard director={{ id: props.film.directorId, firstName: props.film.directorFirstName, lastName: props.film.directorLastName }} />
                 </div>
             </div>
