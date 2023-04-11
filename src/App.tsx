@@ -13,6 +13,7 @@ import { AuthContext } from './util/Contexts';
 import Protected from './layouts/Protected';
 import Login from './pages/Login';
 import axios from 'axios';
+import Logout from './pages/Logout';
 
 function App() {
   const [activeUser, setActiveUser] = React.useState<number>(sessionStorage.getItem('activeUser') as unknown as number)
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/home" element={<Home />} />
                 <Route path="/register" element={<Protected auth={false}><Register /></Protected>} />
                 <Route path="/login" element={<Protected auth={false}><Login /></Protected>} />
+                <Route path="/logout" element={<Protected><Logout /></Protected>} />
                 <Route path="/films" element={<ViewFilms />} />
                 <Route path="/films/:filmId" element={<ViewFilm />} />
                 <Route path="/component/test" element={<SimilarFilms filmId={1} directorId={2} genreId={2} />} />
