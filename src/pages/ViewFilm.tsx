@@ -16,6 +16,7 @@ const ViewFilm = (props: any) => {
     const [film, setFilm] = React.useState<Film>()
     const [timedOut, setTimedOut] = React.useState(false)
     const [errorFlag, setErrorFlag] = React.useState(false)
+    const [notFoundFlag, setNotFoundFlag] = React.useState(false)
     const [loading, setLoading] = React.useState(true)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [genre, setGenre] = React.useState<Genre>({ genreId: 0, name: "Unknown" });
@@ -48,6 +49,7 @@ const ViewFilm = (props: any) => {
         }, 1500)
 
         const getFilm = () => {
+            setNotFoundFlag(false)
             axios.get(process.env.REACT_APP_DOMAIN + "/films/" + filmId)
                 .then((response) => {
                     setErrorFlag(false)
@@ -58,7 +60,10 @@ const ViewFilm = (props: any) => {
                 }, (error) => {
                     console.log(error)
 
-                    if (error.code !== "ERR_NETWORK") {
+                    if (error.response.status === 404) {
+                        setNotFoundFlag(true)
+                        setLoading(false)
+                    } else if (error.code !== "ERR_NETWORK") {
                         setErrorFlag(true)
                         setErrorMessage(error.response.statusText)
                     }
@@ -177,7 +182,7 @@ const ViewFilm = (props: any) => {
         )
     }
 
-    if (!film) {
+    if (!film || notFoundFlag) {
         return (<NotFound />)
     }
 
