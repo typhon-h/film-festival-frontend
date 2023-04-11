@@ -187,15 +187,16 @@ const Register = () => {
 
                     <div className="d-flex flex-row col-12 input-group mb-3">
                         <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="registerPassword" minLength={6} maxLength={64} required />
-                        <button className="btn btn-outline-secondary" type="button" id="showPassword" onClick={() => { setPasswordVisible(!passwordVisible) }}><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                        <button className="btn btn-outline-secondary rounded-end" type="button" id="showPassword" onClick={() => { setPasswordVisible(!passwordVisible) }}><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                        <div className="valid-feedback text-end">
+                            Great!
+                        </div>
+                        <div className="invalid-feedback text-end">
+                            Password must be between 6-64 characters
+                        </div>
                     </div>
 
-                    <div className="valid-feedback text-end">
-                        Great!
-                    </div>
-                    <div className="invalid-feedback text-end">
-                        Password must be between 6-64 characters
-                    </div>
+
                 </div>
 
                 <div className='d-flex flex-column col-12 align-items-start mb-3'>
