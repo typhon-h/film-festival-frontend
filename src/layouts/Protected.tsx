@@ -2,6 +2,8 @@ import React from 'react';
 import { AuthContext } from '../util/Contexts';
 import { useNavigate } from 'react-router-dom';
 
+
+// Used for pages
 const Protected = (props: any) => {
     const [activeUser] = React.useContext(AuthContext)
     const navigate = useNavigate();
