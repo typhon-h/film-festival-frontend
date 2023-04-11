@@ -24,6 +24,9 @@ const Navigation = () => {
                             <Restricted auth={false}>
                                 <NavLink href={'/login'}>Login</NavLink>
                             </Restricted>
+                            <Restricted>
+                                <NavLink href={'/logout'}>Logout</NavLink>
+                            </Restricted>
                         </ul>
                     </div>
 

@@ -9,9 +9,9 @@ const Logout = () => {
     const navigate = useNavigate();
 
     React.useEffect(() => {
+
         const logout = () => {
-            setErrorFlag(false);
-            axios.post(process.env.REACT_APP_DOMAIN + "/logout")
+            axios.post(process.env.REACT_APP_DOMAIN + "/users/logout")
                 .then((response) => {
                     setActiveUser(null)
                     sessionStorage.removeItem('activeUser')
