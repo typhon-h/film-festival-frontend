@@ -156,6 +156,7 @@ const CreateFilm = () => {
                     } else {
                         setErrorFlag(true)
                     }
+                    navigate(`/films/${newFilmId}`) // TODO: this is fine for now as image failure will be visible on film page
                 })
         }
 
