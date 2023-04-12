@@ -2,14 +2,13 @@ import React from "react"
 import DirectorCard from "../components/DirectorCard"
 import axios from "axios"
 import NotFound from "./NotFound"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import default_film_picture from "../assets/default_film_picture.png";
 import { Buffer } from "buffer";
 import ReviewsPanel from "../components/ReviewsPanel"
 import ViewFilmPlaceholder from "./placeholder/ViewFilmPlaceholder"
 import SimilarFilms from "../components/SimilarFilms"
 import Restricted from "../layouts/Restricted"
-import { AuthContext } from "../util/Contexts"
 
 const ViewFilm = (props: any) => {
     const { filmId } = useParams()
@@ -24,8 +23,7 @@ const ViewFilm = (props: any) => {
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
     const [isOnline, setIsOnline] = React.useState(navigator.onLine)
-    const [activeUser] = React.useContext(AuthContext)
-
+    const navigate = useNavigate()
 
     // Handler modified to only 'trigger' on the change from offline>online to preserve page content
     React.useEffect(() => {
@@ -195,7 +193,7 @@ const ViewFilm = (props: any) => {
             <div className="d-flex flex-row col-12">
                 <h1 className='fs-1 text-secondary mb-3 mx-auto'>{film.title}</h1>
                 <Restricted whitelist={[film.directorId]}>
-                    <button className={'btn btn-outline-primary '}>Edit</button>
+                    <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit</button>
                 </Restricted>
             </div>
             <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
