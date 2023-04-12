@@ -60,7 +60,7 @@ const ViewFilm = (props: any) => {
                 }, (error) => {
                     console.log(error)
 
-                    if (error.response.status === 404) {
+                    if (error.response.status === 404 || error.response.status === 400) {
                         setNotFoundFlag(true)
                         setLoading(false)
                     } else if (error.code !== "ERR_NETWORK") {
@@ -90,7 +90,7 @@ const ViewFilm = (props: any) => {
         }
 
         getGenre()
-    }, [film, isOnline])
+    }, [film])
 
     React.useEffect(() => {
         const getHeroImage = () => {
