@@ -9,7 +9,7 @@ const CreateFilm = () => {
     const [newFilmId, setNewFilmId] = React.useState<number>(0)
     const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
     const [titleError, setTitleError] = React.useState<string>('Please enter a valid title less than 64 characters')
-
+    const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
 
     const [genres, setGenres] = React.useState<Genre[]>([]);
     const form = React.useRef<HTMLFormElement>(null)
@@ -115,6 +115,9 @@ const CreateFilm = () => {
                             releaseDate.current?.classList.add('is-invalid')
                         }
                         break
+                    default:
+                        setErrorFlag(true)
+                        break
                 }
             })
         }
@@ -150,7 +153,8 @@ const CreateFilm = () => {
                     console.log(err)
                     if (err.code === 'ERR_NETWORK') {
                         setConnectionFlag(true)
-                        return
+                    } else {
+                        setErrorFlag(true)
                     }
                 })
         }
@@ -164,6 +168,12 @@ const CreateFilm = () => {
             {(connectionFlag) ?
                 <div className="alert alert-danger" role="alert">
                     Unable to connect to the internet. Please try again
+                </div>
+                : ''}
+
+            {(errorFlag) ?
+                <div className="alert alert-danger" role="alert">
+                    An unexpected error occurred. Please try again
                 </div>
                 : ''}
 
