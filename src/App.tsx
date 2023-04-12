@@ -15,6 +15,7 @@ import Login from './pages/Login';
 import axios from 'axios';
 import Logout from './pages/Logout';
 import CreateFilm from './pages/CreateFilm';
+import EditFilm from './pages/EditFilm';
 
 function App() {
   const [activeUser, setActiveUser] = React.useState<number>(localStorage.getItem('activeUser') as unknown as number)
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/films" element={<ViewFilms />} />
                 <Route path="/films/:filmId" element={<ViewFilm />} />
                 <Route path="/films/create" element={<Protected><CreateFilm /></Protected>} />
+                <Route path="/films/:filmId/edit" element={<Protected><EditFilm /></Protected>} />
                 <Route path="/component/test" element={<SimilarFilms filmId={1} directorId={2} genreId={2} />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
