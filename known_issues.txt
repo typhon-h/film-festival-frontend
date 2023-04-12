@@ -1,12 +1,13 @@
 View Films
     - All results briefly load before search
     - Pagination is not present in URL query - only benefit is under 1 'page' parameter
+    - Last page of results does not scroll to top
 
  Filter Films
     - Cannot adjust filter criteria while films loading
 
 View Film
-   - Cannot see date on review to verify sort
+   - Cannot see date on reviews to verify sort
 
 Similar Films
    - No message if no similar films
@@ -16,3 +17,6 @@ Register
 
 Login
    - No error handling if image upload fails (just fails quietly but frontend handles 404s anyway)
+
+Create
+   - No handling if creating film succeeeds and creating image fails (same with Register)
