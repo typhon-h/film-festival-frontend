@@ -8,8 +8,8 @@ import { Buffer } from "buffer";
 import ReviewsPanel from "../components/ReviewsPanel"
 import ViewFilmPlaceholder from "./placeholder/ViewFilmPlaceholder"
 import SimilarFilms from "../components/SimilarFilms"
-
-
+import Restricted from "../layouts/Restricted"
+import { AuthContext } from "../util/Contexts"
 
 const ViewFilm = (props: any) => {
     const { filmId } = useParams()
@@ -24,6 +24,7 @@ const ViewFilm = (props: any) => {
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
     const [isOnline, setIsOnline] = React.useState(navigator.onLine)
+    const [activeUser] = React.useContext(AuthContext)
 
 
     // Handler modified to only 'trigger' on the change from offline>online to preserve page content
@@ -190,9 +191,12 @@ const ViewFilm = (props: any) => {
         <div className="d-flex flex-column align-items-center align-items-sm-center p-4 placeholder-glow">
             {(timedOut) ? error_timed_out() : ''}
             {(errorFlag) ? error_unexpected() : ''}
-            <div className="d-flex flex-column-reverse flex-md-row col-12 col-md-7 align-self-md-end align-items-center justify-content-md-between">
-                <h1 className='fs-1 text-secondary align-self-center mb-3'>{film.title}</h1>
-                <button className='btn btn-outline-primary col-12 col-md-2 mb-3 me-md-5'>Edit</button>
+
+            <div className="d-flex flex-row col-12">
+                <h1 className='fs-1 text-secondary mb-3 mx-auto'>{film.title}</h1>
+                <Restricted whitelist={[film.directorId]}>
+                    <button className={'btn btn-outline-primary '}>Edit</button>
+                </Restricted>
             </div>
             <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
                 <div className='d-flex flex-column col-12 col-sm-8 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5'>
