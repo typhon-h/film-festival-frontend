@@ -8,7 +8,7 @@ const Restricted = (props: any) => {
     const authenticated = (props.auth === undefined) ? true : props.auth
 
 
-    if ((authenticated && activeUser) || (!authenticated && !activeUser)) {
+    if ((props.whitelist && props.whitelist.includes(activeUser)) || (!props.whitelist && authenticated && activeUser) || (props.blacklist && !props.blacklist.includes(activeUser)) || (!props.blacklist && !authenticated && !activeUser)) {
         return (
             <div>
                 {props.children as JSX.Element}
