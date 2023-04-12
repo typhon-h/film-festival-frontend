@@ -11,13 +11,13 @@ const Protected = (props: any) => {
     const [authChecked, setAuthChecked] = React.useState<boolean>(false);
 
     React.useEffect(() => {
-        if (authenticated && !activeUser) {
+        if ((props.whitelist && !props.whitelist.includes(parseInt(activeUser, 10))) || (!props.whitelist && authenticated && !activeUser)) {
             navigate('/login')
-        } else if (!authenticated && activeUser) {
+        } else if ((props.blacklist && props.blacklist.includes(parseInt(activeUser, 10))) || (!props.blacklist && !authenticated && activeUser)) {
             navigate('/')
         }
         setAuthChecked(true)
-    }, [activeUser, authenticated, navigate])
+    }, [activeUser, authenticated, navigate, props.blacklist, props.whitelist])
 
 
     if (authChecked) {
