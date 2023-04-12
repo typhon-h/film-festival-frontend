@@ -90,7 +90,7 @@ const ViewFilm = (props: any) => {
         }
 
         getGenre()
-    }, [film])
+    }, [film, isOnline])
 
     React.useEffect(() => {
         const getHeroImage = () => {
