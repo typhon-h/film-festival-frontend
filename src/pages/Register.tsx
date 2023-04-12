@@ -1,8 +1,6 @@
 import axios from "axios"
 import React from "react"
 import { useNavigate } from "react-router-dom";
-import default_profile_picture from "../assets/default_profile_picture"
-import { getBase64 } from "../util/Image";
 import { login } from "./Login";
 import { AuthContext } from "../util/Contexts";
 
@@ -10,7 +8,7 @@ const Register = () => {
     const navigate = useNavigate();
     const [submitted, setSubmitted] = React.useState<boolean>(false)
     const [emailError, setEmailError] = React.useState<string>("Please enter a valid email")
-    const [newUserImage, setNewUserImage] = React.useState<string>("")
+    const [newUserImage, setNewUserImage] = React.useState<File>()
     const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
     const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
@@ -47,14 +45,10 @@ const Register = () => {
         } else {
             form.current?.classList.remove('was-validated')
             if (image.current?.files?.item(0)) {
-                getBase64(image.current.files.item(0) as File, (str64) => {
-                    setNewUserImage(str64)
-                    setSubmitted(true)
-                })
-            } else {
-                setNewUserImage(default_profile_picture)
-                setSubmitted(true)
+                setNewUserImage(image.current?.files?.item(0) as File)
             }
+
+            setSubmitted(true)
 
         }
     }
@@ -93,6 +87,10 @@ const Register = () => {
                             setErrorFlag(true)
                         }
                     })
+
+                if (!newUserImage) {
+                    navigate('/')
+                }
             }, (err) => {
                 console.log(err)
                 setSubmitted(false)
@@ -119,7 +117,7 @@ const Register = () => {
             })
         }
 
-        if (!(newUserImage.startsWith('data:image/png') || newUserImage.startsWith('data:image/gif') || newUserImage.startsWith('data:image/jpg') || newUserImage.startsWith('data:image/jpeg'))) {
+        if (newUserImage && !(newUserImage.type === 'image/png' || newUserImage.type === 'image/gif' || newUserImage.type === 'image/jpg' || newUserImage.type === 'image/jpeg')) {
             image.current?.classList.add('is-invalid');
             setSubmitted(false)
 
@@ -130,17 +128,19 @@ const Register = () => {
 
         register()
 
-    }, [submitted, newUserImage, setActiveUser])
+    }, [submitted, newUserImage, setActiveUser, navigate])
 
     React.useEffect(() => {
-        if (!submitted) {
+        console.log(activeUser)
+        if (!submitted || activeUser === null) {
             return
         }
         const postImage = (id: number) => {
+            console.log(newUserImage)
             axios.put(process.env.REACT_APP_DOMAIN + `/users/${id}/image`,
                 newUserImage, {
                 headers: {
-                    'Content-Type': newUserImage.split(';')[0].replace('data:', '')
+                    'Content-Type': newUserImage?.type
                 }
             })
                 .then((response) => {
