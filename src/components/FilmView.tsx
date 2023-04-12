@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router-dom";
 import Filters from "./Filters";
 import Sort from "./Sort";
 import Pagination from "./Pagination";
+import Restricted from "../layouts/Restricted";
 
 const FilmView = (props: any) => {
 
@@ -89,8 +90,8 @@ const FilmView = (props: any) => {
 
     const info_no_films = () => {
         return (
-            <div className="alert alert-info" role="alert">
-                No films match your request. Check your criteria or go <a href="/films/create" className="alert-link">here</a> to add a film you have directed.
+            <div className="alert alert-info d-flex flex-row justify-content-center" role="alert">
+                <div className='me-1'>No films match your request. Check your search and/or filters</div><Restricted> or go <a href="/films/create" className="alert-link">here</a> to add a film you have directed</Restricted>
             </div>
         )
     }
