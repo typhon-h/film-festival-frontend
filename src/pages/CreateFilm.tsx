@@ -1,14 +1,14 @@
 import axios from "axios"
 import React from "react"
-import { getBase64 } from "../util/Image";
 import { useNavigate } from "react-router-dom";
 
 const CreateFilm = () => {
     const navigate = useNavigate();
     const [submitted, setSubmitted] = React.useState<boolean>(false)
-    const [newHeroImage, setNewHeroImage] = React.useState<string>('')
+    const [newHeroImage, setNewHeroImage] = React.useState<File>()
     const [newFilmId, setNewFilmId] = React.useState<number>(0)
     const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
+    const [titleError, setTitleError] = React.useState<string>('Please enter a valid title less than 64 characters')
 
 
     const [genres, setGenres] = React.useState<Genre[]>([]);
@@ -63,10 +63,8 @@ const CreateFilm = () => {
             setSubmitted(false)
         } else {
             form.current?.classList.remove('was-validated')
-            getBase64(image.current?.files?.item(0) as File, (str64) => {
-                setNewHeroImage(str64)
-                setSubmitted(true)
-            })
+            setNewHeroImage(image.current?.files?.item(0) as File)
+            setSubmitted(true)
         }
     }
 
@@ -81,8 +79,8 @@ const CreateFilm = () => {
                 title: title.current?.value,
                 genreId: parseInt(genre.current?.value as string),
                 ...(ageRating.current?.value !== '' && { ageRating: ageRating.current?.value }),
-                ...(runtime.current?.value && { runtime: runtime.current?.value }),
-                ...(releaseDate.current?.value && { releaseDate: releaseDate.current?.value }),
+                ...(runtime.current?.value && { runtime: parseInt(runtime.current?.value) }),
+                ...(releaseDate.current?.value && { releaseDate: releaseDate.current?.value + ' 00:00:00' }),
                 description: description.current?.value
             }).then((response) => {
                 setNewFilmId(response.data.filmId);
@@ -97,23 +95,31 @@ const CreateFilm = () => {
 
                 switch (err.response.status) {
                     case 401:
-                        navigate('/login')
+                        navigate('/logout')
                         break
                     case 400:
                         title.current?.classList.add(((err.response.statusText as string).includes('data/title')) ? 'is-invalid' : 'is-valid')
+                        setTitleError('Please enter a valid title less than 64 characters')
                         genre.current?.classList.add(((err.response.statusText as string).includes('data/genreId')) ? 'is-invalid' : 'is-valid')
                         ageRating.current?.classList.add(((err.response.statusText as string).includes('data/ageRating')) ? 'is-invalid' : 'is-valid')
                         runtime.current?.classList.add(((err.response.statusText as string).includes('data/runtime')) ? 'is-invalid' : 'is-valid')
                         releaseDate.current?.classList.add(((err.response.statusText as string).includes('data/releaseDate')) ? 'is-invalid' : 'is-valid')
                         description.current?.classList.add(((err.response.statusText as string).includes('data/description')) ? 'is-invalid' : 'is-valid')
                         break;
+                    case 403:
+                        if ((err.response.statusText as string).toLowerCase().includes('duplicate')) {
+                            title.current?.classList.add('is-invalid')
+                            setTitleError('Film with this title already exists')
+                        }
+                        if ((err.response.statusText as string).toLowerCase().includes('past')) {
+                            releaseDate.current?.classList.add('is-invalid')
+                        }
+                        break
                 }
             })
         }
 
-
-
-        if (!(newHeroImage.startsWith('data:image/png') || newHeroImage.startsWith('data:image/gif') || newHeroImage.startsWith('data:image/jpg') || newHeroImage.startsWith('data:image/jpeg'))) {
+        if (!(newHeroImage?.type === 'image/png' || newHeroImage?.type === 'image/gif' || newHeroImage?.type === 'image/jpg' || newHeroImage?.type === 'image/jpeg')) {
             image.current?.classList.add('is-invalid');
             setSubmitted(false)
 
@@ -135,7 +141,7 @@ const CreateFilm = () => {
             axios.put(process.env.REACT_APP_DOMAIN + `/films/${newFilmId}/image`,
                 newHeroImage, {
                 headers: {
-                    'Content-Type': newHeroImage.split(';')[0].replace('data:', '')
+                    'Content-Type': newHeroImage?.type
                 }
             })
                 .then((response) => {
@@ -180,7 +186,7 @@ const CreateFilm = () => {
                                 Great!
                             </div>
                             <div className="invalid-feedback text-end" id='createFilmFNameInvalid'>
-                                Please enter a valid title less than 64 characters
+                                {titleError}
                             </div>
 
                         </div>
