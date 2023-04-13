@@ -25,6 +25,7 @@ const ViewFilm = (props: any) => {
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
     const [isOnline, setIsOnline] = React.useState(navigator.onLine)
+    const [deleteConfirmed, setDeleteConfirmed] = React.useState(false)
     const navigate = useNavigate()
 
     // Handler modified to only 'trigger' on the change from offline>online to preserve page content
@@ -42,7 +43,6 @@ const ViewFilm = (props: any) => {
 
         }
     }, [isOnline])
-
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
@@ -108,6 +108,31 @@ const ViewFilm = (props: any) => {
             getHeroImage()
         }
     }, [filmId, isOnline, loading])
+
+    React.useEffect(() => {
+        const remove = () => {
+            axios.delete(process.env.REACT_APP_DOMAIN + `/films/${film?.filmId}`)
+                .then((response) => {
+                    navigate('/films') // TODO: maybe navigate to my films
+                }, (err) => {
+                    switch (err.response.status) {
+                        case 404:
+                        case 401:
+                        case 403:
+                            navigate('/films') // Doesn't exist or no permission so user should not be on the page
+                            break;
+                        default:
+                            setErrorFlag(true)
+                            setErrorMessage(err.message)
+                    }
+                })
+        }
+
+        if (deleteConfirmed) {
+            remove()
+        }
+
+    }, [deleteConfirmed, film?.filmId, navigate])
 
     const formatRuntime = (runtime: number) => {
         return ((runtime < 60) ? `${runtime}m` : `${Math.floor(runtime / 60)}h ${runtime % 60}m`)
@@ -188,84 +213,86 @@ const ViewFilm = (props: any) => {
     }
 
     return (
-        <div className="d-flex flex-column align-items-center align-items-sm-center p-4 placeholder-glow">
+        <div>
             {(timedOut) ? error_timed_out() : ''}
             {(errorFlag) ? error_unexpected() : ''}
 
-            <div className="d-flex flex-row col-12">
-                <h1 className='fs-1 text-secondary mb-3 mx-auto'>{film.title}</h1>
-                <Restricted whitelist={[film.directorId]}>
-                    <div className='d-flex flex-row'>
-                        {(film.numReviews === 0) ?
-                            <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit</button>
-                            :
-                            <OverlayTrigger placement="left" overlay={<Tooltip>Cannot edit film after a review has been placed</Tooltip>}>
-                                <span className='d-block'>
-                                    <button className={'btn btn-outline-primary'} disabled>Edit</button>
-                                </span>
-                            </OverlayTrigger>
-                        }
+            <div className="d-flex flex-column align-items-center align-items-sm-center p-4 placeholder-glow">
+                <div className="d-flex flex-row col-12">
+                    <h1 className='fs-1 text-secondary mb-3 mx-auto'>{film.title}</h1>
+                    <Restricted whitelist={[film.directorId]}>
+                        <div className='d-flex flex-row'>
+                            {(film.numReviews === 0) ?
+                                <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit', { replace: true }) }}>Edit</button>
+                                :
+                                <OverlayTrigger placement="left" overlay={<Tooltip>Cannot edit film after a review has been placed</Tooltip>}>
+                                    <span className='d-block'>
+                                        <button className={'btn btn-outline-primary'} disabled>Edit</button>
+                                    </span>
+                                </OverlayTrigger>
+                            }
 
-                        <button className={'btn btn-danger ms-2'} type='button' data-bs-toggle='modal' data-bs-target='#deleteFilmModal'>Delete</button>
+                            <button className={'btn btn-danger ms-2'} type='button' data-bs-toggle='modal' data-bs-target='#deleteFilmModal'>Delete</button>
 
-                        <div className="modal fade" id={'deleteFilmModal'} tabIndex={-1} role="dialog" aria-labelledby={'deleteFilmModelLabel'} aria-hidden="true">
-                            <div className="modal-dialog" role="document">
-                                <div className="modal-content">
-                                    <div className="modal-header">
-                                        <h5 className="modal-title" id={'deleteFilmModelLabel'}>Delete Film</h5>
-                                        <button type="button" className="btn close" data-bs-dismiss="modal" aria-label="Close">
-                                            <i className="bi bi-x-lg" aria-hidden='true'></i>
-                                        </button>
-                                    </div>
-                                    <div className="modal-body">
-                                        Are you sure that you want to delete the film "{film?.title}"
-                                    </div>
-                                    <div className="modal-footer">
-                                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                                            Close
-                                        </button>
-                                        <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => { navigate('') }}>
-                                            Delete Film
-                                        </button>
+                            <div className="modal fade" id={'deleteFilmModal'} tabIndex={-1} role="dialog" aria-labelledby={'deleteFilmModelLabel'} aria-hidden="true">
+                                <div className="modal-dialog" role="document">
+                                    <div className="modal-content">
+                                        <div className="modal-header">
+                                            <h5 className="modal-title" id={'deleteFilmModelLabel'}>Delete Film</h5>
+                                            <button type="button" className="btn close" data-bs-dismiss="modal" aria-label="Close">
+                                                <i className="bi bi-x-lg" aria-hidden='true'></i>
+                                            </button>
+                                        </div>
+                                        <div className="modal-body">
+                                            Are you sure that you want to delete the film "{film?.title}"
+                                        </div>
+                                        <div className="modal-footer">
+                                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => { setDeleteConfirmed(true) }}>
+                                                Delete Film
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </Restricted>
-            </div>
-            <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
-                <div className='d-flex flex-column col-12 col-sm-8 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5 img-thumbnail'>
-                    <div className={'ratio ratio-1x1 ' + (heroImageLoaded ? '' : 'placeholder')} >
-                        <img className={'mx-auto ratio ratio-1x1 ' + ((!heroImageLoaded) ? 'placeholder' : '')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
-                    </div>
+                    </Restricted>
                 </div>
-
-                <div className='d-flex flex-column flex-sm-row-reverse flex-lg-column col-12 col-lg-7 col-xxl-7 justify-content-sm-around justify-content-xxl-center align-items-center m-sm-3 mt-lg-0'>
-                    <div className='d-flex flex-column col-12 col-sm-6 col-lg-12 col-xxl-12'>
-                        <p className="d-inline-block col-12 text-dark text-start text-wrap text-break"><b>Description: </b>{film.description}</p>
-
-                        <div className='d-flex flex-column col-12 col-md-8 col-lg-5 col-xl-5 col-xxl-4 mb-3'>
-                            <p className='align-self-start fw-bold'>Director:</p>
-                            <div className='bg-light rounded-3'>
-                                <DirectorCard director={{ id: film.directorId, firstName: film.directorFirstName, lastName: film.directorLastName }} />
-                            </div>
+                <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
+                    <div className='d-flex flex-column col-12 col-sm-8 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5 img-thumbnail'>
+                        <div className={'ratio ratio-1x1 ' + (heroImageLoaded ? '' : 'placeholder')} >
+                            <img className={'mx-auto ratio ratio-1x1 ' + ((!heroImageLoaded) ? 'placeholder' : '')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
                         </div>
                     </div>
 
-                    {film_details(film)}
+                    <div className='d-flex flex-column flex-sm-row-reverse flex-lg-column col-12 col-lg-7 col-xxl-7 justify-content-sm-around justify-content-xxl-center align-items-center m-sm-3 mt-lg-0'>
+                        <div className='d-flex flex-column col-12 col-sm-6 col-lg-12 col-xxl-12'>
+                            <p className="d-inline-block col-12 text-dark text-start text-wrap text-break"><b>Description: </b>{film.description}</p>
+
+                            <div className='d-flex flex-column col-12 col-md-8 col-lg-5 col-xl-5 col-xxl-4 mb-3'>
+                                <p className='align-self-start fw-bold'>Director:</p>
+                                <div className='bg-light rounded-3'>
+                                    <DirectorCard director={{ id: film.directorId, firstName: film.directorFirstName, lastName: film.directorLastName }} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {film_details(film)}
+                    </div>
                 </div>
-            </div>
 
-            <div className='d-flex flex-column mb-4 col-12 col-xxl-8'>
-                <ReviewsPanel filmId={filmId} rating={film.rating} />
-            </div>
+                <div className='d-flex flex-column mb-4 col-12 col-xxl-8'>
+                    <ReviewsPanel filmId={filmId} rating={film.rating} />
+                </div>
 
-            <div className='d-flex flex-column col-12 col-md-5 col-lg-8 col-xxl-6'>
-                <SimilarFilms filmId={film.filmId} directorId={film.directorId} genreId={film.genreId} />
-            </div>
+                <div className='d-flex flex-column col-12 col-md-5 col-lg-8 col-xxl-6'>
+                    <SimilarFilms filmId={film.filmId} directorId={film.directorId} genreId={film.genreId} />
+                </div>
 
-        </div >
+            </div >
+        </div>
     )
 
 }
