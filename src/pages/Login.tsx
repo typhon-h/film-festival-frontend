@@ -112,9 +112,9 @@ const Login = () => {
 
                 </div>
                 <div className={'text-danger flex-row col-12 justify-content-center mb-2 ' + ((errorFlag) ? 'visible' : 'invisible')}>Incorrect email or password</div>
-                <div className="d-flex flex-column flex-lg-row justify-content-between">
-                    <button type="reset" className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5">Clear</button>
-                    <button type="submit" className="btn btn-primary col-12 col-lg-5">Login</button>
+                <div className="d-flex flex-column-reverse flex-lg-row justify-content-between">
+                    <button type="reset" className="btn btn-outline-secondary col-12 col-lg-5">Clear</button>
+                    <button type="submit" className="btn btn-primary col-12 col-lg-5 mb-2 mb-lg-0">Login</button>
                 </div>
             </form >
         </div >
