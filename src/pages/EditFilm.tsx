@@ -202,7 +202,7 @@ const EditFilm = () => {
                     navigate(`/films/${film?.filmId}`)
                 }, (err) => {
                     console.log(err)
-                    navigate(`/films/${film?.filmId}`) // TODO: fix based on Morgan responses
+                    navigate(`/films/${film?.filmId}`)
                 })
         }
 

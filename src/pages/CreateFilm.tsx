@@ -149,14 +149,9 @@ const CreateFilm = () => {
             })
                 .then((response) => {
                     navigate(`/films/${newFilmId}`)
-                }, (err) => { // TODO: Ask Morgan about clean way to handle this error
+                }, (err) => {
                     console.log(err)
-                    if (err.code === 'ERR_NETWORK') {
-                        setConnectionFlag(true)
-                    } else {
-                        setErrorFlag(true)
-                    }
-                    navigate(`/films/${newFilmId}`) // TODO: this is fine for now as image failure will be visible on film page
+                    navigate(`/films/${newFilmId}`)
                 })
         }
 

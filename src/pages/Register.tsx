@@ -144,14 +144,10 @@ const Register = () => {
                 }
             })
                 .then((response) => {
-                    navigate('/') // TODO: redirect to profile page
-                }, (err) => { //TODO: Ask Morgan about clean way to handle this error
+                    navigate('/')
+                }, (err) => { //TODO: Redirect user profile
                     console.log(err)
-
-                    if (err.code === 'ERR_NETWORK') {
-                        setConnectionFlag(true)
-                        return
-                    }
+                    navigate('/')
                 })
         }
 
