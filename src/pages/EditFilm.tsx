@@ -1,15 +1,21 @@
 import axios from "axios"
 import React from "react"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import NotFound from "./NotFound";
 
 const EditFilm = () => {
     const navigate = useNavigate();
+    const { filmId } = useParams();
     const [submitted, setSubmitted] = React.useState<boolean>(false)
     const [newHeroImage, setNewHeroImage] = React.useState<File>()
-    const [newFilmId, setNewFilmId] = React.useState<number>(0)
-    const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
+    const [film, setFilm] = React.useState<Film>()
     const [titleError, setTitleError] = React.useState<string>('Please enter a valid title less than 64 characters')
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
+    const [isOnline, setIsOnline] = React.useState(navigator.onLine)
+    const [notFoundFlag, setNotFoundFlag] = React.useState(false)
+    const [timedOut, setTimedOut] = React.useState(false)
+    const [loading, setLoading] = React.useState(true)
+
 
     const [genres, setGenres] = React.useState<Genre[]>([]);
     const form = React.useRef<HTMLFormElement>(null)
@@ -20,6 +26,57 @@ const EditFilm = () => {
     const releaseDate = React.useRef<HTMLInputElement>(null)
     const description = React.useRef<HTMLTextAreaElement>(null)
     const image = React.useRef<HTMLInputElement>(null)
+
+    // Handler modified to only 'trigger' on the change from offline>online to preserve page content
+    React.useEffect(() => {
+        const handleStatusChange = () => {
+            setIsOnline(navigator.onLine);
+        };
+
+        window.addEventListener("online", handleStatusChange)
+        window.addEventListener("offline", handleStatusChange)
+
+        return () => {
+            window.removeEventListener('online', handleStatusChange);
+            window.removeEventListener('offline', handleStatusChange);
+
+        }
+    }, [isOnline])
+
+
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setTimedOut(true)
+        }, 1500)
+
+        const getFilm = () => {
+            setNotFoundFlag(false)
+            axios.get(process.env.REACT_APP_DOMAIN + "/films/" + filmId)
+                .then((response) => {
+                    setErrorFlag(false)
+                    setFilm(response.data)
+                    setLoading(false)
+                    clearTimeout(timer)
+                    setTimedOut(false)
+                }, (error) => {
+                    console.log(error)
+
+                    if (error.response.status === 404 || error.response.status === 400) {
+                        setNotFoundFlag(true)
+                        setLoading(false)
+                    } else if (error.code !== "ERR_NETWORK") {
+                        setErrorFlag(true)
+                        // setErrorMessage(error.response.statusText)
+                    }
+
+                    clearTimeout(timer)
+                    setTimedOut(false)
+
+                })
+        }
+
+        getFilm()
+    }, [filmId, isOnline])
 
     React.useEffect(() => {
         const getGenre = () => {
@@ -63,7 +120,9 @@ const EditFilm = () => {
             setSubmitted(false)
         } else {
             form.current?.classList.remove('was-validated')
-            setNewHeroImage(image.current?.files?.item(0) as File)
+            if (image.current?.files?.item(0)) {
+                setNewHeroImage(image.current?.files?.item(0) as File)
+            }
             setSubmitted(true)
         }
     }
@@ -73,23 +132,25 @@ const EditFilm = () => {
             return
         }
 
-        const create = () => {
-            setConnectionFlag(false)
-            axios.post(process.env.REACT_APP_DOMAIN + '/films', {
-                title: title.current?.value,
-                genreId: parseInt(genre.current?.value as string),
-                ...(ageRating.current?.value !== '' && { ageRating: ageRating.current?.value }),
-                ...(runtime.current?.value && { runtime: parseInt(runtime.current?.value) }),
-                ...(releaseDate.current?.value && { releaseDate: releaseDate.current?.value + ' 00:00:00' }),
-                description: description.current?.value
+        const edit = () => {
+            axios.patch(process.env.REACT_APP_DOMAIN + `/films/${film?.filmId}`, {
+                ...(title.current?.value !== film?.title && { title: title.current?.value }),
+                ...(genre.current?.value !== film?.genreId && { genreId: parseInt(genre.current?.value as string, 10) }),
+                ...(ageRating.current?.value !== film?.ageRating && { ageRating: ageRating.current?.value }),
+                ...(runtime.current?.value && parseInt(runtime.current.value, 10) !== film?.runtime && { runtime: parseInt(runtime.current.value, 10) }),
+                ...(releaseDate.current?.value && releaseDate.current.value !== film?.releaseDate.split('T')[0] && { releaseDate: releaseDate.current.value + ' 00:00:00' }),
+                ...(description.current?.value !== film?.description && { description: description.current?.value })
             }).then((response) => {
-                setNewFilmId(response.data.filmId);
+                if (!newHeroImage) {
+                    navigate(`/films/${film?.filmId}`)
+                } else {
+                    postImage()
+                }
             }, (err) => {
                 console.log(err)
                 setSubmitted(false)
 
                 if (err.code === 'ERR_NETWORK') {
-                    setConnectionFlag(true)
                     return
                 }
 
@@ -122,7 +183,23 @@ const EditFilm = () => {
             })
         }
 
-        if (!(newHeroImage?.type === 'image/png' || newHeroImage?.type === 'image/gif' || newHeroImage?.type === 'image/jpg' || newHeroImage?.type === 'image/jpeg')) {
+
+        const postImage = () => {
+            axios.put(process.env.REACT_APP_DOMAIN + `/films/${film?.filmId}/image`,
+                newHeroImage, {
+                headers: {
+                    'Content-Type': newHeroImage?.type
+                }
+            })
+                .then((response) => {
+                    navigate(`/films/${film?.filmId}`)
+                }, (err) => {
+                    console.log(err)
+                    navigate(`/films/${film?.filmId}`) // TODO: fix based on Morgan responses
+                })
+        }
+
+        if (newHeroImage && !(newHeroImage?.type === 'image/png' || newHeroImage?.type === 'image/gif' || newHeroImage?.type === 'image/jpg' || newHeroImage?.type === 'image/jpeg')) {
             image.current?.classList.add('is-invalid');
             setSubmitted(false)
 
@@ -131,82 +208,79 @@ const EditFilm = () => {
             image.current?.classList.add('is-valid');
         }
 
-        create()
-    }, [navigate, newHeroImage, submitted])
+        edit()
+    }, [film, navigate, newHeroImage, submitted])
 
 
-    React.useEffect(() => {
 
-        if (!submitted || newFilmId === 0) {
-            return
-        }
-        const postImage = () => {
-            axios.put(process.env.REACT_APP_DOMAIN + `/films/${newFilmId}/image`,
-                newHeroImage, {
-                headers: {
-                    'Content-Type': newHeroImage?.type
-                }
-            })
-                .then((response) => {
-                    navigate(`/films/${newFilmId}`)
-                }, (err) => { // TODO: Ask Morgan about clean way to handle this error
-                    console.log(err)
-                    if (err.code === 'ERR_NETWORK') {
-                        setConnectionFlag(true)
-                    } else {
-                        setErrorFlag(true)
-                    }
-                    navigate(`/films/${newFilmId}`) // TODO: this is fine for now as image failure will be visible on film page
-                })
-        }
+    const error_offline = () => {
+        return (
+            <div className="alert alert-danger" role="alert">
+                We are having trouble connecting to the internet. Check your network settings or click <a href={window.location.href} className="alert-link">here</a> to try again.
+            </div>
+        )
+    }
 
-        postImage()
-    }, [navigate, newFilmId, newHeroImage, submitted])
+    const error_timed_out = () => {
+        return (
+            <div className="alert alert-warning" role="alert">
+                Slow network connection. Please check your network or wait while we process your request
+            </div>
+        )
+    }
 
+    const error_unexpected = () => {
+        return (
+            <div className="alert alert-danger" role="alert">
+                An unexpected error occurred. Please try again
+            </div>
+        )
+    }
+
+    if (notFoundFlag) {
+        return <NotFound />
+    }
 
     return (
-        <div>
-            {(connectionFlag) ?
-                <div className="alert alert-danger" role="alert">
-                    Unable to connect to the internet. Please try again
-                </div>
-                : ''}
+        <div className='d-flex flex-column col-12'>
 
-            {(errorFlag) ?
-                <div className="alert alert-danger" role="alert">
-                    An unexpected error occurred. Please try again
-                </div>
-                : ''}
+            {(errorFlag) ? error_unexpected() : ''}
+            {(timedOut && isOnline) ? error_timed_out() : ''}
+            {(!isOnline) ? error_offline() : ''}
 
-            <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100' >
+            <div className={"spinner-border position-absolute align-self-center " + ((loading || submitted) ? 'd-flex' : 'd-none')} style={{ width: '4rem', height: '4rem', top: '40%' }} role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+
+            <div className={'d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100 ' + ((loading || submitted || !isOnline) ? 'opacity-25' : '')} >
 
                 <div className='mb-3'>
                     <h1>Edit Film</h1>
                 </div>
 
-                <form ref={form} className='d-flex flex-column col-10 col-md-6 ' onSubmit={validate} id='createFilmForm' noValidate>
+                <form ref={form} className='d-flex flex-column col-10 col-md-6 ' onSubmit={validate} id='editFilmForm' noValidate>
 
                     <div className="d-flex flex-column flex-lg-row align-items-start justify-content-lg-between">
                         <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
                             <div className='d-flex flex-row col-12 justify-content-between'>
-                                <label htmlFor="createFilmTitle" className="form-label">Title</label>
+                                <label htmlFor="editFilmTitle" className="form-label">Title</label>
                                 <span className='fs-6 text-muted'>required</span>
                             </div>
-                            <input ref={title} type="text" className="form-control" id="createFilmTitle" maxLength={64} placeholder={'My New Film'} aria-describedby={'createFilmTitleInvalid'} autoFocus={true} required />
+                            <input ref={title} type="text" className="form-control" id="editFilmTitle" maxLength={64} defaultValue={(film) ? film.title : ''} aria-describedby={'editFilmTitleInvalid'} autoFocus={true} required disabled={loading || submitted || !isOnline} />
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
-                            <div className="invalid-feedback text-end" id='createFilmFNameInvalid'>
+                            <div className="invalid-feedback text-end" id='editFilmFNameInvalid'>
                                 {titleError}
                             </div>
 
                         </div>
                         <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
                             <div className='d-flex flex-row col-12 justify-content-between'>
-                                <label htmlFor="createFilmGenre" className="form-label">Genre</label>
+                                <label htmlFor="editFilmGenre" className="form-label">Genre</label>
                                 <span className='fs-6 text-muted'>required</span>
                             </div>
-                            <select ref={genre} className="form-select" aria-label="Select a genre" defaultValue='' required>
+                            <select key={genres.toString() + film?.genreId} ref={genre} className="form-select" aria-label="Select a genre" defaultValue={(film) ? film.genreId : ''} required disabled={loading || submitted || !isOnline}>
                                 <option value='' disabled>Select...</option>
                                 {genres.map((genre) => {
                                     return (
@@ -223,15 +297,14 @@ const EditFilm = () => {
                         </div>
                     </div>
 
-
                     <div className="d-flex flex-column flex-lg-row align-items-start justify-content-lg-around">
                         <div className='d-flex flex-column col-12 col-lg-3 align-items-start mb-3'>
                             <div className='d-flex flex-row col-12 justify-content-between'>
-                                <label htmlFor="createFilmAgeRating" className="form-label">Age Rating</label>
+                                <label htmlFor="editFilmAgeRating" className="form-label">Age Rating</label>
                                 <span className='fs-6 text-muted'>optional</span>
                             </div>
-                            <select ref={ageRating} className="form-select" defaultValue={''} aria-label="Select a age rating">
-                                <option value="">Select...</option>
+                            <select key={film?.ageRating} ref={ageRating} className="form-select" defaultValue={(film) ? film.ageRating : ''} aria-label="Select a age rating" disabled={loading || submitted || !isOnline}>
+                                <option value="" disabled>Select...</option>
                                 {['TBC', 'G', 'PG', 'M', 'R13', 'R16', 'R18'].map((r: string) => {
                                     return (
                                         <option key={r} value={r}>{r}</option>
@@ -241,17 +314,17 @@ const EditFilm = () => {
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
-                            <div className="invalid-feedback text-end" id='createFilmAgeRatingInvalid'>
+                            <div className="invalid-feedback text-end" id='editFilmAgeRatingInvalid'>
                                 Please select a valid option
                             </div>
 
                         </div>
                         <div className='d-flex flex-column col-12 col-lg-3 align-items-start mb-3'>
                             <div className='d-flex flex-row col-12 justify-content-between'>
-                                <label htmlFor="createFilmRuntime" className="form-label">Runtime (mins)</label>
+                                <label htmlFor="editFilmRuntime" className="form-label">Runtime (mins)</label>
                                 <span className='fs-6 text-muted'>optional</span>
                             </div>
-                            <input ref={runtime} type="number" className="form-control" id="createFilmRuntime" min={1} max={300} />
+                            <input ref={runtime} type="number" className="form-control" defaultValue={(film) ? film.runtime : ''} id="editFilmRuntime" min={1} max={300} disabled={loading || submitted || !isOnline} />
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
@@ -261,25 +334,25 @@ const EditFilm = () => {
                         </div>
                         <div className='d-flex flex-column col-12 col-lg-3 align-items-start mb-3'>
                             <div className='d-flex flex-row col-12 justify-content-between'>
-                                <label htmlFor="createFilmReleaseDate" className="form-label">Release Date</label>
+                                <label htmlFor="editFilmReleaseDate" className="form-label">Release Date</label>
                                 <span className='fs-6 text-muted'>optional</span>
                             </div>
-                            <input ref={releaseDate} type="date" className="form-control d-flex justify-content-center align-items-center" id="createFilmReleaseDate" min={new Date(Date.now()).toISOString().split('T')[0]} />
+                            <input ref={releaseDate} type="date" defaultValue={(film) ? film?.releaseDate.split('T')[0] : ''} className="form-control d-flex justify-content-center align-items-center" id="editFilmReleaseDate" min={new Date(Date.now()).toISOString().split('T')[0]} disabled={loading || submitted || !isOnline} />
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
                             <div className="invalid-feedback text-end">
-                                Please enter a date that is not in the past
+                                Please enter a date that is not in the past. This cannot be changed after the current date has passed
                             </div>
                         </div>
                     </div>
 
                     <div className='d-flex flex-column col-12 align-items-start mb-3'>
                         <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="createFilmEmail" className="form-label">Description</label>
+                            <label htmlFor="editFilmEmail" className="form-label">Description</label>
                             <span className='fs-6 text-muted'>required</span>
                         </div>
-                        <textarea ref={description} className="form-control" id="createFilmDescription" maxLength={512} placeholder={'Tell us about your film...'} required />
+                        <textarea ref={description} className="form-control" defaultValue={(film) ? film?.description : ''} id="editFilmDescription" maxLength={512} required disabled={loading || submitted || !isOnline} />
                         <div className="valid-feedback text-end">
                             Great!
                         </div>
@@ -290,10 +363,10 @@ const EditFilm = () => {
 
                     <div className='d-flex flex-column col-12 align-items-start mb-3'>
                         <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="createFilmProfilePicture" className="form-label">Upload Hero Image</label>
-                            <span className='fs-6 text-muted'>required</span>
+                            <label htmlFor="editFilmProfilePicture" className="form-label">Upload Hero Image</label>
+                            <span className='fs-6 text-muted'>optional</span>
                         </div>
-                        <input ref={image} type="file" className="form-control" accept="image/png,image/gif,image/jpeg, image/jpg" id="createFilmHeroImage" required />
+                        <input ref={image} type="file" className="form-control" accept="image/png,image/gif,image/jpeg, image/jpg" id="editFilmHeroImage" disabled={loading || submitted || !isOnline} />
                         <div className="valid-feedback text-end">
                             Great!
                         </div>
@@ -302,12 +375,12 @@ const EditFilm = () => {
                         </div>
                     </div>
                     <div className="d-flex flex-column flex-lg-row justify-content-between">
-                        <button type="reset" className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5">Clear</button>
-                        <button type="submit" className="btn btn-primary col-12 col-lg-5">Submit</button>
+                        <button type="button" onClick={() => { navigate(`/films/${film?.filmId}`) }} className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5" disabled={loading || submitted || !isOnline}>Cancel</button>
+                        <button type="submit" className="btn btn-primary col-12 col-lg-5" disabled={loading || submitted}>Update</button>
                     </div>
                 </form >
             </div >
-        </div>
+        </div >
     )
 }
 
