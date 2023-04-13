@@ -10,6 +10,7 @@ const EditFilm = () => {
     const [newHeroImage, setNewHeroImage] = React.useState<File>()
     const [film, setFilm] = React.useState<Film>()
     const [titleError, setTitleError] = React.useState<string>('Please enter a valid title less than 64 characters')
+    const [releaseDateError, setReleaseDateError] = React.useState<string>('Please enter a date that is not in the past.')
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
     const [isOnline, setIsOnline] = React.useState(navigator.onLine)
     const [notFoundFlag, setNotFoundFlag] = React.useState(false)
@@ -138,7 +139,7 @@ const EditFilm = () => {
                 ...(genre.current?.value !== film?.genreId && { genreId: parseInt(genre.current?.value as string, 10) }),
                 ...(ageRating.current?.value !== film?.ageRating && { ageRating: ageRating.current?.value }),
                 ...(runtime.current?.value && parseInt(runtime.current.value, 10) !== film?.runtime && { runtime: parseInt(runtime.current.value, 10) }),
-                ...(releaseDate.current?.value && releaseDate.current.value !== film?.releaseDate.split('T')[0] && { releaseDate: releaseDate.current.value + ' 00:00:00' }),
+                ...(releaseDate.current?.value && releaseDate.current.value !== film?.releaseDate.split('T')[0] && { releaseDate: releaseDate.current.value + ' 23:59:59' }),
                 ...(description.current?.value !== film?.description && { description: description.current?.value })
             }).then((response) => {
                 if (!newHeroImage) {
@@ -165,6 +166,7 @@ const EditFilm = () => {
                         ageRating.current?.classList.add(((err.response.statusText as string).includes('data/ageRating')) ? 'is-invalid' : 'is-valid')
                         runtime.current?.classList.add(((err.response.statusText as string).includes('data/runtime')) ? 'is-invalid' : 'is-valid')
                         releaseDate.current?.classList.add(((err.response.statusText as string).includes('data/releaseDate')) ? 'is-invalid' : 'is-valid')
+                        setReleaseDateError('Please enter a date that is not in the past.')
                         description.current?.classList.add(((err.response.statusText as string).includes('data/description')) ? 'is-invalid' : 'is-valid')
                         break;
                     case 403:
@@ -174,6 +176,11 @@ const EditFilm = () => {
                         }
                         if ((err.response.statusText as string).toLowerCase().includes('past')) {
                             releaseDate.current?.classList.add('is-invalid')
+                            setReleaseDateError('Please enter a date that is not in the past.')
+                        }
+                        if ((err.response.statusText as string).toLowerCase().includes('film already released')) {
+                            releaseDate.current?.classList.add('is-invalid')
+                            setReleaseDateError('Cannot change the release date of a film that has already passed')
                         }
                         break
                     default:
@@ -337,12 +344,12 @@ const EditFilm = () => {
                                 <label htmlFor="editFilmReleaseDate" className="form-label">Release Date</label>
                                 <span className='fs-6 text-muted'>optional</span>
                             </div>
-                            <input ref={releaseDate} type="date" defaultValue={(film) ? film?.releaseDate.split('T')[0] : ''} className="form-control d-flex justify-content-center align-items-center" id="editFilmReleaseDate" min={new Date(Date.now()).toISOString().split('T')[0]} disabled={loading || submitted || !isOnline} />
+                            <input ref={releaseDate} type="date" defaultValue={(film) ? film?.releaseDate.split('T')[0] : ''} className="form-control d-flex justify-content-center align-items-center" id="editFilmReleaseDate" min={new Date(Date.now()).toISOString().split('T')[0]} disabled={loading || submitted || !isOnline || Date.parse(film?.releaseDate as string) < Date.now()} />
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
                             <div className="invalid-feedback text-end">
-                                Please enter a date that is not in the past. This cannot be changed after the current date has passed
+                                {releaseDateError}
                             </div>
                         </div>
                     </div>
