@@ -11,6 +11,7 @@ View Film
 
 Similar Films
    - No message if no similar films
+   - If similar film is missing image default image is sometimes not displayed
 
 Register
    - Email validation not same on front as in api
