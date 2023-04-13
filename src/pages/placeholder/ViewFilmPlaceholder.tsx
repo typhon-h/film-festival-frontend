@@ -66,6 +66,7 @@ const ViewFilmPlaceholder = (props: any) => {
             </div>
 
             <div className='d-flex flex-column align-items-center col-12 col-md-5 col-lg-8 col-xxl-6'>
+                {/* eslint-disable-next-line jsx-a11y/heading-has-content */}
                 <h3 className='col-5 placeholder'></h3>
                 <FilmCardPlaceholder />
             </div>
