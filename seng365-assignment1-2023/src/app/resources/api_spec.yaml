@@ -1,0 +1,878 @@
+openapi: 3.0.0
+info:
+  title: "SENG365 2023: Film Festival Site API"
+  version: 1.0.3
+  description: "This specification documents the API that must be implemented for Assignment 1. The API provides all of the server-side functionality necessary in order to implement all the user stories for Assignment 2"
+servers:
+  - url: https://seng365.csse.canterbury.ac.nz/api/v1
+    description: "Reference server"
+  - url: http://localhost:4941/api/v1
+    description: "Your development server"
+tags:
+  - name: backdoor
+    description: "Development-only endpoints for resetting the database or querying it directly. You will not be implementing these endpoints."
+  - name: users
+    description: "Endpoints for registering, logging in, modifying, and retrieving user information"
+  - name: users.images
+    description: "Endpoints for retrieving, uploading and deleting user profile images"
+  - name: films
+    description: "Endpoints for retrieving, creating, modifying, and deleting films"
+  - name: films.images
+    description: "Endpoints for retrieving, uploading and deleting film images"
+  - name: films.reviews
+    description: "Endpoints for retrieving and adding reviews for films"
+paths:
+  /reset:
+    post:
+      tags:
+        - backdoor
+      summary: "Force reset of database to original structure."
+      responses:
+        '200':
+          description: "OK"
+        '500':
+          description: "Internal Server Error"
+  /resample:
+    post:
+      tags:
+        - backdoor
+      summary: "Reload sample of data into database."
+      responses:
+        '201':
+          description: "Created"
+        '500':
+          description: "Internal Server Error"
+  /reload:
+    post:
+      tags:
+        - backdoor
+      summary: "Force reload of database to original structure and reload all sample data"
+      responses:
+        201:
+          description: "Created"
+        500:
+          description: "Internal Server Error"
+  /executesql:
+    post:
+      tags:
+        - backdoor
+      summary: "Execute any arbitrary SQL statement provided, and return the output from the database."
+      description: "This is an enormous security hole, and <b>wouldn't</b> be present in any real-world application. However, we're using it for testing purposes in this assignment"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              title: SqlCommand
+              type: string
+              example: "SELECT * from films;"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SqlResult"
+                  - $ref: "#/components/schemas/SqlResultSet"
+        500:
+          description: "Internal Server Error"
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: "Register as a new user"
+      description: "The email must be syntactically valid (e.g. it has to include an `@` and a top level domain for example `x@y.z`). Whether it is actually a registered email address will not be checked. The email address <b>must not</b> already be in use (if it is in use the server should return a 403). The password <b>must</b> be a minimum of 6 characters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUser"
+      responses:
+        201:
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        400:
+          description: "Bad Request. Invalid information"
+        403:
+          description: "Forbidden. Email already in use"
+        500:
+          description: "Internal Sever Error"
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: "Log in as an existing user."
+      description: "The response will contain a (unique) randomly-generated token that that client-side should store.<br>Whenever the client makes a request that requires authentication it should provide that same token as the value of the `X-Authorization` header in the request. The server will compare this to the value it has stored in the database to authenticate that request."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        400:
+          description: "Bad Request. Invalid information"
+        401:
+          description: "Not Authorised. Incorrect email/password"
+        500:
+          description: "Internal Server Error"
+  /users/logout:
+    post:
+      tags:
+        - users
+      summary: "Log out the currently authorised user."
+      description: "User will be logged out and their token will no longer be acceptable for authenticated requests"
+      security:
+        - UserToken: []
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized. Cannot log out if you are not authenticated"
+        500:
+          description: "Internal Server Error"
+  /users/{id}:
+    parameters:
+      - name: "id"
+        description: "ID of the user"
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/LoginResponse/properties/userId"
+    get:
+      tags:
+        - users
+      summary: "Retrieve information about a user"
+      description: "The email field is only returned when the currently authenticated user is viewing their **own** details. Otherwise only the first and last names should be returned (this includes unauthenticated requests)."
+      security:
+        - {}
+        - UserToken: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+                required:
+                  - firstName
+                  - lastName
+        404:
+          description: "Not Found. No user with specified ID"
+        500:
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - users
+      summary: "Change a user's details"
+      description: "Only accessible by the user themselves. The email must be syntactically valid and not in use as described in `/users/register`.<br>The password and currentPassword field should only be supplied when editing the password. The current password **must match the users existing password**, and the password **must not be the same** and must be **6 or more** characters. **Note**: A subset of values can be supplied in the body (i.e. only changing the email)"
+      security:
+        - UserToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchUser"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad request. Invalid information"
+        401:
+          description: "Unauthorized or Invalid currentPassword"
+        403:
+          description: "Forbidden. This is not your account, or the email is already in use, or identical current and new passwords"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /users/{id}/image:
+    parameters:
+      - name: "id"
+        description: "ID of the user"
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/LoginResponse/properties/userId"
+    get:
+      tags:
+        - users.images
+      summary: "Retrieve a user's profile image"
+      description: "The response MIME type will be one of `image/png`, `image/jpeg`, or `image/gif` depending on the filetype of the image being retrieved."
+      responses:
+        200:
+          description: "OK"
+          content:
+            image:
+              schema:
+                $ref: "#/components/schemas/BinaryImageFile"
+        404:
+          description: "Not Found. No user with specified ID, or user has no image"
+        500:
+          description: "Internal Server Error"
+    put:
+      tags:
+        - users.images
+      summary: "Set a user's profile photo"
+      description: "Only accessible to the user themselves. If the user already has a profile photo, the current profile photo will be replaced with it and a 200 OK response sent. If not, a 201 Created response will be sent.<br>If the file is a `.png`, the request will be sent with `Content-Type: image/png`. If the file is a `.jpeg` or `.jpg`, the request will be sent with `Content-Type: image/jpeg`. If the file is a `.gif`, the request will be sent with `Content-Type: image/gif`.<br>The request body should contain the raw binary content of the photo, i.e. it should not be in `multipart/form-data` format or contain any file metadata."
+      security:
+        - UserToken: []
+      requestBody:
+        content:
+          image/png:
+            schema:
+              $ref: "#/components/schemas/BinaryImageFile"
+          image/jpeg:
+            schema:
+              $ref: "#/components/schemas/BinaryImageFile"
+          image/gif:
+            schema:
+              $ref: "#/components/schemas/BinaryImageFile"
+        required: true
+      responses:
+        200:
+          description: "OK. Image updated"
+        201:
+          description: "Created. New image created"
+        400:
+          description: "Bad Request. Invalid image supplied (possibly incorrect file type)"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden. Can not change another user's profile photo"
+        404:
+          description: "Not found. No such user with ID given"
+        500:
+          description: "Internal Server Error"
+    delete:
+      tags:
+        - users.images
+      summary: "Delete a user's profile image"
+      security:
+        - UserToken: []
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden. Can not delete another user's profile photo"
+        404:
+          description: "Not Found. No such user with ID given"
+        500:
+          description: "Internal Server Error"
+  /films:
+    get:
+      tags:
+        - films
+      summary: "View films"
+      description: "Get a list of all films with a subset of film information. By default, the films should be sorted by when they were released from oldest to newest. The list should be filtered, then sorted, then paginated using `startIndex` and `count`. The returned object should include the total number of films that match the search criteria, which may differ from the number returned by the query (this is for client pagination).<br/>The film rating is a number up to 2 decimal places, with unnecessary values ignored e.g.; 0.00 -> 0, 7.50 -> 7.5, 6.333Ë™ -> 6.33"
+      parameters:
+        - in: query
+          name: startIndex
+          description: "Number of items to skip before returning results"
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/startIndex"
+        - in: query
+          name: count
+          description: "Number of items to include in results."
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/count"
+        - in: query
+          name: q
+          description: "Only include films that have the search term in their title or description."
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/q"
+        - in: query
+          name: genreIds
+          description: "Only include films that match any of the given genres (by id). Only ids that map to categories are allowed."
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/genreIds"
+        - in: query
+          name: ageRatings
+          description: "Only include films that match any of the given age ratings."
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/ageRatings"
+        - in: query
+          name: directorId
+          description: "Only include films that have the given user (id) as their director."
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/directorId"
+        - in: query
+          name: reviewerId
+          description: "Only include films that where the given user (id) has made a review."
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/reviewerId"
+        - in: query
+          name: sortBy
+          description: "Sort the films by the given property, according to the following rules:<br>- ALPHABETICAL_ASC: alphabetically by title, A-Z<br>- ALPHABETICAL_DESC: alphabetically by title, Z-A<br>- RELEASED_ASC: chronologically in order of release date oldest-newest<br>- RELEASED_DESC: chronologically in order of release date newest-oldest<br>- RATING ASC: by rating, Low-High<br>- RATING_DESC: by rating High-Low<br>Movies without rating are considered to have a rating of 0"
+          schema:
+            $ref: "#/components/schemas/FilmSearchRequest/properties/sortBy"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FilmSearchResponse"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - films
+      summary: "Add a new film."
+      description: "The genre id number must reference an existing category. `title`, `description` and `genreId` are required, other properties are optional. If the `title` is already in use it should return 403.  The `releaseDate` <b>must</b> be in the future if provided, otherwise the release date will be set to when the request is received by the server.<br>If `ageRating` is supplied it must be one of 'G', 'PG', 'M', 'R16', 'R18', or 'TBC'. If it is not supplied it should default to 'TBC'. If `runtime` is not supplied it should default to null."
+      security:
+        - UserToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostFilm"
+      responses:
+        201:
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                properties:
+                  filmId:
+                    $ref: "#/components/schemas/FilmOverview/properties/filmId"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden. Film title is not unique, or cannot release a film in the past"
+        500:
+          description: "Internal Server Error"
+  /films/{id}:
+    parameters:
+      - name: id
+        description: "The id of the film"
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/FilmOverview/properties/filmId"
+    get:
+      tags:
+        - films
+      summary: "Retrieve detailed information about a film. "
+      description: "Retrieve all information about a film matching `id`. Like GET `/films` the rating is a number up to 2 decimal places"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Film"
+        404:
+          description: "Not Found. No film with id"
+        500:
+          description: "Internal Server Error"
+    patch:
+      tags:
+        - films
+      summary: "Change a film's details."
+      description: "Only accessible to the director of the film. If updated the `genreId` must reference an existing genre and the `releaseDate` (if supplied) must be in the future. The `title` if supplied must be unqiue as mentioned in POST `/films`. **Note**: No changes may be made after a review has been made on a film and the `releaseDate` cannot be changed after it has passed, if `releaseDate` is included the request will be rejected and none of the other attributes changed"
+      security:
+        - UserToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostFilm"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request. Invalid information"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden. Only the director of an film may change it, cannot change the releaseDate since it has already passed, cannot edit a film that has a review placed, or cannot release a film in the past"
+        404:
+          description: "Not Found. No film found with id"
+        500:
+          description: "Internal Server Error"
+    delete:
+      tags:
+        - films
+      summary: "Delete a film"
+      description: "Only accessible to the director of the film. Films **can** be deleted after a review has been placed. Deleting a film should also delete it's associated image."
+      security:
+        - UserToken: []
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden. Only the director of an film can delete it"
+        404:
+          description: "Not Found. No film found with id"
+        500:
+          description: "Internal Server Error"
+  /films/genres:
+    get:
+      tags:
+        - films
+      summary: "Retrieve all data about film genres"
+      description: "Retrieve list of all films with `genreId` and `name` values. Do not assume this list of genres will never change. Ordering does not matter."
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Genre"
+        500:
+          description: "Internal Server Error"
+  /films/{id}/image:
+    parameters:
+      - name: id
+        description: "ID of the film."
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/FilmOverview/properties/filmId"
+    get:
+      tags:
+        - films.images
+      summary: "Retrieve a film's hero image"
+      description: "The response MIME type will be either `image/png`, `image/jpeg`, or `image/gif`, depending on the file type of the image being retrieved."
+      responses:
+        200:
+          description: "OK"
+          content:
+            image:
+              schema:
+                $ref: "#/components/schemas/BinaryImageFile"
+        404:
+          description: "Not found. No film found with id, or film has no image"
+        500:
+          description: "Internal Server Error"
+    put:
+      tags:
+        - films.images
+      summary: "Set a film's hero image"
+      description: "Only accessible to the director of the film, the image may be changed at any time (even if a review has already been placed). <b>This endpoint used to expect a 403 if a review was placed, for fairness we will allow either implementation</b>.<br/>If the film already has a hero image, the current hero image will be replaced and a 200 OK response sent. If not, a 201 created response will be sent.<br>If the file is a `.png`, the request will be sent with `Content-Type: image/png`. If the file is a `.jpeg` or `.jpg`, the request will be sent with `Content-Type: image/jpeg`. If the file is a `.gif`, the request will be sent with `Content-Type: image/gif`. No other image types should be allowed. <br> The request body should contain the raw binary content of the photo, i.e. it should not be in `multipart/form-data` format or contain any file metadata."
+      security:
+        - UserToken: []
+      requestBody:
+        content:
+          image/png:
+            schema:
+              $ref: '#/components/schemas/BinaryImageFile'
+          image/jpeg:
+            schema:
+              $ref: '#/components/schemas/BinaryImageFile'
+          image/gif:
+            schema:
+              $ref: '#/components/schemas/BinaryImageFile'
+        required: true
+      responses:
+        200:
+          description: "OK"
+        201:
+          description: "Created"
+        400:
+          description: "Bad Request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden. Only the director of a film can change the hero image"
+        404:
+          description: "Not Found. No film found with id"
+        500:
+          description: "Internal Server Error"
+  /films/{id}/reviews:
+    parameters:
+      - name: id
+        description: "Id of the film"
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/FilmOverview/properties/filmId"
+    get:
+      tags:
+        - films.reviews
+      summary: "Retrieve all the reviews for a film"
+      description: "The reviews are returned in reverse chronological order (from most recent to oldest) by `timestamp`"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+        404:
+          description: "Not Found. No film found with id"
+        500:
+          description: "Internal Server Error"
+    post:
+      tags:
+        - films.reviews
+      summary: "Place a review on a film"
+      description: "A user can only place a review on a film that **has released**. This review **must** have a `rating` between 1 - 10 (inclusive), and can **optionally** include a textual review.<br>The director of a film **can not** place a review on their own film."
+      security:
+        - UserToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostReview"
+      responses:
+        201:
+          description: "Created"
+        400:
+          description: "Bad Request. Invalid information"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden. Cannot review your own film, or cannot post a review on a film that has not yet released"
+        404:
+          description: "Not Found. No film found with id"
+        500:
+          description: "Internal Server Error"
+components:
+  schemas:
+    SqlResult:
+      type: object
+      properties:
+        fieldCount:
+          type: integer
+          example: 0
+        affectedRows:
+          type: integer
+          example: 1
+        insertId:
+          type: integer
+          example: 1
+        serverStatus:
+          type: integer
+          example: 2
+        warningCount:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: "(Rows matched: 1 Changed: 0 Warnings 0)"
+        protcol41:
+          type: boolean
+          example: true
+        changedRows:
+          type: integer
+          example: 0
+    SqlResultSet:
+      type: array
+      items: {}
+    UserEmail:
+      title: UserEmail
+      type: object
+      properties:
+        email:
+          type: string
+          description: "<i>Must include an @ symbol and a top level domain i.e. \"x@y.z\"</i>"
+          minLength: 1
+          maxLength: 256
+          format: email
+          example: "adam@example.com"
+    UserPassword:
+      title: UserPassword
+      properties:
+        password:
+          type: string
+          minLength: 6
+          maxLength: 64
+          format: password
+          example: "password"
+    UserCurrentPassword:
+      title: UserCurrentPassword
+      properties:
+        currentPassword:
+          type: string
+          minLength: 6
+          maxLength: 64
+          format: password
+          example: "old_password"
+    User:
+      title: User
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/UserEmail"
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 64
+          example: "Jane"
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 64
+          example: "Doe"
+    RegisterUser:
+      title: RegisterUser
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - $ref: "#/components/schemas/UserPassword"
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+    LoginUser:
+      title: LoginUser
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/UserEmail"
+        - $ref: "#/components/schemas/UserPassword"
+      required:
+        - email
+        - password
+    RegisterResponse:
+      title: RegisterResponse
+      type: object
+      properties:
+        userId:
+          type: integer
+          minimum: 0
+          example: 11
+    LoginResponse:
+      title: LoginResponse
+      type: object
+      properties:
+        userId:
+          type: integer
+          minimum: 0
+          example: 11
+        token:
+          type: string
+          example: "JSkIEpXk0b2jLgDpRuKAjGwCbFnDM0Tj"
+    PatchUser:
+      title: PatchUser
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - $ref: "#/components/schemas/UserPassword"
+        - $ref: "#/components/schemas/UserCurrentPassword"
+    DateTimeInput:
+      title: DateTimeInput
+      description: A datetime expressed with no timezone, as either a date (yyyy-MM-dd) or date and time (yyyy-MM-dd hh:mm:ss.sss)
+      type: string
+      example: '2012-04-23 18:25:43'
+    DateTimeOutput:
+      title: DateTimeOutput
+      description: A UTC datetime expressed in ISO8601 format (yyyy-MM-ddThh:mm:ss.sssZ)
+      type: string
+      example: '2012-04-23T18:25:43.511Z'
+    BinaryImageFile:
+      type: string
+      format: binary
+      description: The raw content of the PNG, JPEG, or GIF image file.
+      example: (raw content of PNG, JPEG, or GIF image file)
+    Genre:
+      title: Genre
+      type: object
+      properties:
+        genreId:
+          type: integer
+          minimum: 0
+          example: 1
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+          example: "Comedy"
+    FilmSearchRequest:
+      title: FilmSearchRequest
+      type: object
+      properties:
+        startIndex:
+          type: integer
+          minimum: 0
+          default: 0
+          example: 10
+        count:
+          type: integer
+          minimum: 0
+          example: 10
+        q:
+          type: string
+          minLength: 1
+          maxLength: 64
+          example: "Moonlight"
+        genreIds:
+          type: array
+          items:
+            $ref: "#/components/schemas/Genre/properties/genreId"
+        ageRatings:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilmOverview/properties/ageRating"
+        directorId:
+          $ref: "#/components/schemas/LoginResponse/properties/userId"
+        reviewerId:
+          $ref: "#/components/schemas/LoginResponse/properties/userId"
+        sortBy:
+          type: string
+          enum:
+            - ALPHABETICAL_ASC
+            - ALPHABETICAL_DESC
+            - RELEASED_ASC
+            - RELEASED_DESC
+            - RATING_ASC
+            - RATING_DESC
+          default: RELEASED_ASC
+    FilmSearchResponse:
+      title: FilmSearchReturn
+      type: object
+      properties:
+        films:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilmOverview"
+          nullable: false
+        count:
+          type: integer
+          minimum: 0
+          example: 17
+          nullable: false
+    FilmOverview:
+      title: FilmOverview
+      type: object
+      properties:
+        filmId:
+          type: integer
+          minimum: 0
+          example: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 64
+          example: "Moonlit Horizons"
+        genreId:
+          type: integer
+          minimum: 0
+          example: 1
+        ageRating:
+          type: string
+          enum:
+            - "G"
+            - "PG"
+            - "M"
+            - "R13"
+            - "R16"
+            - "R18"
+            - "TBC"
+        directorId:
+          $ref: "#/components/schemas/LoginResponse/properties/userId"
+        directorFirstName:
+          $ref: "#/components/schemas/User/properties/firstName"
+        directorLastName:
+          $ref: "#/components/schemas/User/properties/lastName"
+        rating:
+          type: number
+          format: float # Does this matter?
+          minimum: 0.0
+          maximum: 10.0
+          example: 7.5
+        releaseDate:
+          $ref: "#/components/schemas/DateTimeOutput"
+    Film:
+      title: Film
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/FilmOverview"
+      properties:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 512
+          example: "A film that dives into the intricacies of those who lead lives in the night"
+        runtime:
+          type: integer
+          minimum: 1
+          maximum: 300 # 5 hours in minutes
+          example: 98
+          nullable: true # do we want it to be nullable? in return only?
+        numReviews:
+          type: integer
+          minimum: 0
+          example: 5
+    PostFilm:
+      title: PostFilm
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/FilmOverview/properties/title"
+        description:
+          $ref: "#/components/schemas/Film/properties/description"
+        releaseDate:
+          $ref: "#/components/schemas/DateTimeInput"
+        genreId:
+          $ref: "#/components/schemas/FilmOverview/properties/genreId"
+        runtime:
+          $ref: "#/components/schemas/Film/properties/runtime"
+        ageRating:
+          $ref: "#/components/schemas/FilmOverview/properties/ageRating"
+      required:
+        - title
+        - description
+        - genreId
+    Review:
+      title: Review
+      type: object
+      properties:
+        reviewerId:
+          type: integer
+          minimum: 0
+          example: 1
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 10
+          example: 5
+        review:
+          type: string
+          minLength: 1
+          maxLength: 512
+          nullable: true
+          example: "I really enjoyed it! Spectacular camerawork helps to bring out ..."
+        reviewerFirstName:
+          $ref: "#/components/schemas/User/properties/firstName"
+        reviewerLastName:
+          $ref: "#/components/schemas/User/properties/lastName"
+        timestamp:
+          $ref: "#/components/schemas/DateTimeOutput"
+    PostReview:
+      title: PostReview
+      type: object
+      properties:
+        rating:
+          $ref: "#/components/schemas/Review/properties/rating"
+        review:
+          $ref: "#/components/schemas/Review/properties/review"
+      required:
+        - rating
+  securitySchemes:
+    UserToken:
+      type: apiKey
+      name: X-Authorization
+      in: header
