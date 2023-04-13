@@ -182,6 +182,9 @@ const EditFilm = () => {
                             releaseDate.current?.classList.add('is-invalid')
                             setReleaseDateError('Cannot change the release date of a film that has already passed')
                         }
+                        if ((err.response.statusText as string).toLowerCase().includes('review')) {
+                            navigate(`/films/${film?.filmId}`)
+                        }
                         break
                     default:
                         setErrorFlag(true)

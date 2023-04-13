@@ -9,6 +9,12 @@ import ReviewsPanel from "../components/ReviewsPanel"
 import ViewFilmPlaceholder from "./placeholder/ViewFilmPlaceholder"
 import SimilarFilms from "../components/SimilarFilms"
 import Restricted from "../layouts/Restricted"
+import { Tooltip } from "bootstrap"
+
+const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle = "tooltip"]'))
+tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+    return new Tooltip(tooltipTriggerEl)
+})
 
 const ViewFilm = (props: any) => {
     const { filmId } = useParams()
@@ -193,7 +199,9 @@ const ViewFilm = (props: any) => {
             <div className="d-flex flex-row col-12">
                 <h1 className='fs-1 text-secondary mb-3 mx-auto'>{film.title}</h1>
                 <Restricted whitelist={[film.directorId]}>
-                    <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit</button>
+                    <span className="d-block w-auto h-auto" tabIndex={0} data-bs-toggle={(film.numReviews > 0) ? "tooltip" : ""} data-bs-trigger="focus" data-bs-placement="left" data-bs-title="Cannot edit when review has been placed">
+                        <button className={'btn btn-outline-primary'} onClick={() => { (film.numReviews > 0) ? navigate('') : navigate('edit') }} disabled={film.numReviews > 0}>Edit</button>
+                    </span>
                 </Restricted>
             </div>
             <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
