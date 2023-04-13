@@ -296,9 +296,9 @@ const CreateFilm = () => {
                             File must be one of the following: png, gif, jpeg
                         </div>
                     </div>
-                    <div className="d-flex flex-column flex-lg-row justify-content-between">
-                        <button type="reset" className="btn btn-outline-secondary mb-2 mb-lg-0 col-12 col-lg-5">Clear</button>
-                        <button type="submit" className="btn btn-primary col-12 col-lg-5">Submit</button>
+                    <div className="d-flex flex-column-reverse flex-lg-row justify-content-between">
+                        <button type="reset" className="btn btn-outline-secondary col-12 col-lg-5">Clear</button>
+                        <button type="submit" className="btn btn-primary col-12 col-lg-5 mb-2 mb-lg-0">Submit</button>
                     </div>
                 </form >
             </div >
