@@ -19,7 +19,7 @@ const Logout = () => {
                     axios.defaults.headers.common = {
                         'x-authorization': ''
                     }
-                    navigate('/')
+                    navigate('/', { replace: true })
                 }, (err) => {
                     console.log(err)
                     if (err.response.status === 401) {
@@ -29,7 +29,7 @@ const Logout = () => {
                         axios.defaults.headers.common = {
                             'x-authorization': ''
                         }
-                        navigate('/')
+                        navigate('/', { replace: true })
                     } else {
                         setErrorFlag(true)
                     }
