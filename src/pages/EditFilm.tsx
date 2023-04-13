@@ -31,7 +31,7 @@ const EditFilm = () => {
     const image = React.useRef<HTMLInputElement>(null)
 
     React.useEffect(() => {
-        if (film?.numReviews as number > 0 || activeUser !== film?.directorId) {
+        if (film && (film.numReviews > 0 || (parseInt(activeUser, 10) !== film.directorId))) {
             navigate(-1)
         }
     }, [activeUser, film, navigate])
