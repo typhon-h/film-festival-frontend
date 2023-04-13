@@ -29,7 +29,7 @@ const DirectorCard = (props: any) => {
         <div className={'d-flex flex-column align-items-start justify-content-between py-2 px-3 ' + (directorImageLoaded ? '' : 'placeholder-glow')}>
             <div className='d-flex flex-row col-12 align-items-center justify-content-between py-2 flex-wrap'>
                 <div className={'ratio ratio-1x1 rounded-circle border overflow-hidden ' + (directorImageLoaded ? '' : 'placeholder')} style={{ minWidth: '20%', maxWidth: '20%' }}>
-                    <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={directorImage} alt="Director Icon" style={{ objectFit: 'cover' }} />
+                    <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={(directorImageLoaded) ? directorImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="} alt="Director Icon" style={{ objectFit: 'cover' }} />
                 </div>
                 <div className='d-flex flex-row col-9 justify-content-around flex-wrap'>
                     <p className="mb-0">{props.director.firstName}</p>
