@@ -1,7 +1,7 @@
 View Films
     - All results briefly load before search
     - Pagination is not present in URL query - only benefit is under 1 'page' parameter
-    - Last page of results does not scroll to top
+    - Some pages of results does not scroll to top
 
  Filter Films
     - Cannot adjust filter criteria while films loading
@@ -19,4 +19,4 @@ Login
    - No error handling if image upload fails (just fails quietly but frontend handles 404s anyway)
 
 Create
-   - No handling if creating film succeeeds and creating image fails (same with Register)
+   - Image upload error is ignored (404 error is handled)
