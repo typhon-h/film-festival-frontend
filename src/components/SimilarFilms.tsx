@@ -8,11 +8,9 @@ const SimilarFilms = (props: any) => {
 
     React.useEffect(() => {
         const getFilms = () => {
-            console.log(process.env.REACT_APP_DOMAIN + "/films?directorId=" + props.directorId)
             axios.get(process.env.REACT_APP_DOMAIN + "/films?directorId=" + props.directorId)
                 .then((response) => {
                     setDirectorFilms(response.data.films)
-                    console.log(response.data.films)
                 }, (error) => {
                     console.log(error)
                 })
@@ -24,7 +22,6 @@ const SimilarFilms = (props: any) => {
 
     React.useEffect(() => {
         const getFilms = () => {
-            console.log(process.env.REACT_APP_DOMAIN + "/films?genreIds=" + props.genreId)
             axios.get(process.env.REACT_APP_DOMAIN + "/films?genreIds=" + props.genreId)
                 .then((response) => {
                     setGenreFilms(response.data.films)

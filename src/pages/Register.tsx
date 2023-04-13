@@ -131,12 +131,10 @@ const Register = () => {
     }, [submitted, newUserImage, setActiveUser, navigate])
 
     React.useEffect(() => {
-        console.log(activeUser)
         if (!submitted || activeUser === null) {
             return
         }
         const postImage = (id: number) => {
-            console.log(newUserImage)
             axios.put(process.env.REACT_APP_DOMAIN + `/users/${id}/image`,
                 newUserImage, {
                 headers: {

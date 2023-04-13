@@ -54,7 +54,6 @@ const FilmView = (props: any) => {
         }
 
         const getFilms = () => {
-            console.log(process.env.REACT_APP_DOMAIN + "/films" + buildQuery())
             axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery())
                 .then((response) => {
                     setErrorFlag(false)
