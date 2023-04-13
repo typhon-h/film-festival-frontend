@@ -195,17 +195,43 @@ const ViewFilm = (props: any) => {
             <div className="d-flex flex-row col-12">
                 <h1 className='fs-1 text-secondary mb-3 mx-auto'>{film.title}</h1>
                 <Restricted whitelist={[film.directorId]}>
-                    {(film.numReviews === 0) ?
-                        <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit</button>
-                        :
-                        <OverlayTrigger placement="left" overlay={<Tooltip>Cannot edit film after a review has been placed</Tooltip>}>
-                            <span className='d-block'>
-                                <button className={'btn btn-outline-primary'} disabled>Edit</button>
-                            </span>
-                        </OverlayTrigger>
-                    }
+                    <div className='d-flex flex-row'>
+                        {(film.numReviews === 0) ?
+                            <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit</button>
+                            :
+                            <OverlayTrigger placement="left" overlay={<Tooltip>Cannot edit film after a review has been placed</Tooltip>}>
+                                <span className='d-block'>
+                                    <button className={'btn btn-outline-primary'} disabled>Edit</button>
+                                </span>
+                            </OverlayTrigger>
+                        }
 
+                        <button className={'btn btn-danger ms-2'} type='button' data-bs-toggle='modal' data-bs-target='#deleteFilmModal'>Delete</button>
 
+                        <div className="modal fade" id={'deleteFilmModal'} tabIndex={-1} role="dialog" aria-labelledby={'deleteFilmModelLabel'} aria-hidden="true">
+                            <div className="modal-dialog" role="document">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title" id={'deleteFilmModelLabel'}>Delete Film</h5>
+                                        <button type="button" className="btn close" data-bs-dismiss="modal" aria-label="Close">
+                                            <i className="bi bi-x-lg" aria-hidden='true'></i>
+                                        </button>
+                                    </div>
+                                    <div className="modal-body">
+                                        Are you sure that you want to delete the film "{film?.title}"
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => { navigate('') }}>
+                                            Delete Film
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </Restricted>
             </div>
             <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
