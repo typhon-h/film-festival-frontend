@@ -8,6 +8,7 @@ View Films
 
 View Film
    - Cannot see date on reviews to verify sort
+   - Genre sometimes does not load (check dependencies)
 
 Similar Films
    - No message if no similar films
