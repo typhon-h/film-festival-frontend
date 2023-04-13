@@ -2,6 +2,7 @@ import axios from "axios"
 import React from "react"
 import { useNavigate, useParams } from "react-router-dom";
 import NotFound from "./NotFound";
+import { AuthContext } from "../util/Contexts";
 
 const EditFilm = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const EditFilm = () => {
     const [notFoundFlag, setNotFoundFlag] = React.useState(false)
     const [timedOut, setTimedOut] = React.useState(false)
     const [loading, setLoading] = React.useState(true)
+    const [activeUser] = React.useContext(AuthContext)
 
 
     const [genres, setGenres] = React.useState<Genre[]>([]);
@@ -27,6 +29,12 @@ const EditFilm = () => {
     const releaseDate = React.useRef<HTMLInputElement>(null)
     const description = React.useRef<HTMLTextAreaElement>(null)
     const image = React.useRef<HTMLInputElement>(null)
+
+    React.useEffect(() => {
+        if (film?.numReviews as number > 0 || activeUser !== film?.directorId) {
+            navigate(`/films/${film?.filmId}`)
+        }
+    }, [activeUser, film, navigate])
 
     // Handler modified to only 'trigger' on the change from offline>online to preserve page content
     React.useEffect(() => {
