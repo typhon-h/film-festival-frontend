@@ -32,7 +32,7 @@ const EditFilm = () => {
 
     React.useEffect(() => {
         if (film?.numReviews as number > 0 || activeUser !== film?.directorId) {
-            navigate(`/films/${film?.filmId}`)
+            navigate(-1)
         }
     }, [activeUser, film, navigate])
 
