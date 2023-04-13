@@ -151,7 +151,7 @@ const EditFilm = () => {
                 ...(description.current?.value !== film?.description && { description: description.current?.value })
             }).then((response) => {
                 if (!newHeroImage) {
-                    navigate(`/films/${film?.filmId}`)
+                    navigate(`/films/${film?.filmId}`, { replace: true })
                 } else {
                     postImage()
                 }
@@ -165,7 +165,7 @@ const EditFilm = () => {
 
                 switch (err.response.status) {
                     case 401:
-                        navigate('/logout')
+                        navigate('/logout', { replace: true })
                         break
                     case 400:
                         title.current?.classList.add(((err.response.statusText as string).includes('data/title')) ? 'is-invalid' : 'is-valid')
@@ -191,7 +191,7 @@ const EditFilm = () => {
                             setReleaseDateError('Cannot change the release date of a film that has already passed')
                         }
                         if ((err.response.statusText as string).toLowerCase().includes('review')) {
-                            navigate(`/films/${film?.filmId}`)
+                            navigate(`/films/${film?.filmId}`, { replace: true })
                         }
                         break
                     default:
@@ -210,10 +210,10 @@ const EditFilm = () => {
                 }
             })
                 .then((response) => {
-                    navigate(`/films/${film?.filmId}`)
+                    navigate(`/films/${film?.filmId}`, { replace: true })
                 }, (err) => {
                     console.log(err)
-                    navigate(`/films/${film?.filmId}`)
+                    navigate(`/films/${film?.filmId}`, { replace: true })
                 })
         }
 
@@ -393,7 +393,7 @@ const EditFilm = () => {
                         </div>
                     </div>
                     <div className="d-flex flex-column-reverse flex-lg-row justify-content-between">
-                        <button type="button" onClick={() => { navigate(`/films/${film?.filmId}`) }} className="btn btn-outline-secondary col-12 col-lg-5" disabled={loading || submitted || !isOnline}>Cancel</button>
+                        <button type="button" onClick={() => { navigate(`/films/${film?.filmId}`, { replace: true }) }} className="btn btn-outline-secondary col-12 col-lg-5" disabled={loading || submitted || !isOnline}>Cancel</button>
                         <button type="submit" className="btn btn-primary col-12 col-lg-5 mb-2 mb-lg-0" disabled={loading || submitted}>Update</button>
                     </div>
                 </form >
