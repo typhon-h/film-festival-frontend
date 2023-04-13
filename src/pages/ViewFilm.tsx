@@ -209,7 +209,7 @@ const ViewFilm = (props: any) => {
                 </Restricted>
             </div>
             <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
-                <div className='d-flex flex-column col-12 col-sm-8 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5'>
+                <div className='d-flex flex-column col-12 col-sm-8 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5 img-thumbnail'>
                     <div className={'ratio ratio-1x1 ' + (heroImageLoaded ? '' : 'placeholder')} >
                         <img className={'mx-auto ratio ratio-1x1 ' + ((!heroImageLoaded) ? 'placeholder' : '')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" />
                     </div>
