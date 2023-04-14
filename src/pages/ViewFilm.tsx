@@ -116,10 +116,12 @@ const ViewFilm = (props: any) => {
                     navigate('/films') // TODO: maybe navigate to my films
                 }, (err) => {
                     switch (err.response.status) {
-                        case 404:
                         case 401:
+                            navigate('/logout', { replace: true })
+                            break
+                        case 404:
                         case 403:
-                            navigate('/films') // Doesn't exist or no permission so user should not be on the page
+                            navigate('/films', { replace: true }) // Doesn't exist or no permission so user should not be on the page
                             break;
                         default:
                             setErrorFlag(true)
