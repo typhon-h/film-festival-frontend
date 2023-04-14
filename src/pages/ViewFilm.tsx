@@ -244,7 +244,7 @@ const ViewFilm = (props: any) => {
                                             </button>
                                         </div>
                                         <div className="modal-body">
-                                            Are you sure that you want to delete the film "{film?.title}"
+                                            Are you sure that you want to delete the film <span className='text-danger'>{film?.title}</span>
                                         </div>
                                         <div className="modal-footer">
                                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
