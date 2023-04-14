@@ -12,7 +12,6 @@ View Film
 
 Similar Films
    - No message if no similar films
-   - If first similar film is missing image and another film has image first image will sometimes inherit image of other film 
 
 Register
    - Email validation not same on front as in api

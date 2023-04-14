@@ -3,59 +3,33 @@ import React from "react"
 import FilmCard from "./FilmCard"
 
 const SimilarFilms = (props: any) => {
-    const [directorFilms, setDirectorFilms] = React.useState<Film[]>([])
-    const [genreFilms, setGenreFilms] = React.useState<Film[]>([])
+    const [result, setResult] = React.useState<Film[]>([])
+
 
     React.useEffect(() => {
         const getFilms = () => {
-            axios.get(process.env.REACT_APP_DOMAIN + "/films?directorId=" + props.directorId)
-                .then((response) => {
-                    setDirectorFilms(response.data.films)
-                }, (error) => {
-                    console.log(error)
-                })
-        }
-
-        getFilms()
-
-    }, [props.directorId])
-
-    React.useEffect(() => {
-        const getFilms = () => {
+            axios.all([axios.get(process.env.REACT_APP_DOMAIN + "/films?directorId=" + props.directorId),
             axios.get(process.env.REACT_APP_DOMAIN + "/films?genreIds=" + props.genreId)
-                .then((response) => {
-                    setGenreFilms(response.data.films)
-                }, (error) => {
-                    console.log(error)
-                })
+            ]).then((responses) => {
+                setResult(
+                    responses[1].data.films.concat(responses[0].data.films).filter((item: Film, index: number, arr: Film[]) =>
+                        item.filmId !== props.filmId && arr.findIndex(film => film.filmId === item.filmId) === index)
+                )
+            })
         }
 
         getFilms()
 
-    }, [props.genreId])
+    }, [props.directorId, props.filmId, props.genreId])
 
 
-    const getFilms = (): Film[] => {
-        const result = (directorFilms.length > genreFilms.length) ? mergeArrays(genreFilms, directorFilms) : mergeArrays(directorFilms, genreFilms)
 
-        return result.filter(film => film.filmId !== props.filmId)
-    }
-
-    const mergeArrays = (arr1: Film[], arr2: Film[]): Film[] => {
-        arr1.forEach((film) => {
-            if (!arr2.find((entry) => { return entry.filmId === film.filmId })) {
-                arr2.push(film)
-            }
-        });
-
-        return arr2;
-    }
-
-    if (getFilms().length === 0) {
+    if (result.length === 0) {
         return (
             <div></div>
         )
     }
+
 
     return (
         <div className='d-flex flex-column align-items-center col-12'>
@@ -63,18 +37,16 @@ const SimilarFilms = (props: any) => {
 
             <div id="similarFilms" className="carousel carousel-dark slide col-12" data-bs-ride="carousel">
                 <div className="carousel-indicators">
-                    {getFilms().map((film: Film, index) =>
+                    {result.map((film: Film, index) =>
                         <button key={index} type="button" data-bs-target="#similarFilms" data-bs-slide-to={index} className={' ' + ((index === 0) ? 'active' : '')} aria-current={((index === 0) ? true : false)} aria-label={`Slide ${index}`}></button>
                     )}
                 </div>
                 <div className="carousel-inner">
-
-                    {getFilms().map((film: Film, index) =>
+                    {result.map((film: Film, index) =>
                         <div key={index} className={"carousel-item " + ((index === 0) ? 'active' : '')}>
                             <FilmCard film={film} />
                         </div>
                     )}
-
                 </div >
                 <button className="carousel-control-prev" type="button" data-bs-target="#similarFilms" data-bs-slide="prev">
                     <span className="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
@@ -89,4 +61,4 @@ const SimilarFilms = (props: any) => {
     )
 }
 
-export default SimilarFilms
+export default React.memo(SimilarFilms)
