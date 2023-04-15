@@ -7,7 +7,7 @@ const Restricted = (props: any) => {
     const [activeUser] = React.useContext(AuthContext)
     const authenticated = (props.auth === undefined) ? true : props.auth
 
-    if ((props.whitelist && props.whitelist.includes(parseInt(activeUser, 10))) || (!props.whitelist && authenticated && activeUser) || (props.blacklist && !props.blacklist.includes(parseInt(activeUser, 10))) || (!props.blacklist && !authenticated && !activeUser)) {
+    if ((props.whitelist && props.whitelist.includes(parseInt(activeUser, 10))) || (!props.whitelist && !props.blacklist && authenticated && activeUser) || (props.blacklist && !props.blacklist.includes(parseInt(activeUser, 10))) || (!props.blacklist && !props.whitelist && !authenticated && !activeUser)) {
         return (
             <div>
                 {props.children as JSX.Element}
