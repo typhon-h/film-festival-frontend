@@ -3,6 +3,7 @@ import React from "react"
 import DirectorCard from "./DirectorCard"
 import Restricted from "../layouts/Restricted"
 import { useNavigate } from "react-router-dom"
+import { AuthContext } from "../util/Contexts"
 
 const ReviewsPanel = (props: any) => {
     const [reviews, setReviews] = React.useState<Review[]>([])
@@ -13,6 +14,7 @@ const ReviewsPanel = (props: any) => {
     const [postErrorFlag, setPostErrorFlag] = React.useState(false)
     const [expanded, setExpanded] = React.useState(false);
     const [submitted, setSubmitted] = React.useState<boolean>(false)
+    const [activeUser] = React.useContext(AuthContext)
     const navigate = useNavigate()
 
 
@@ -102,37 +104,53 @@ const ReviewsPanel = (props: any) => {
 
     const review_form = () => {
         return (
-            <form ref={form} className={'d-flex flex-column align-items-center border border-top-0 col-12 p-2 needs-validation'} onSubmit={validate} noValidate>
-                <h5 className='text-muted fs-4'>Review it yourself</h5>
-                <div className='d-flex flex-row justify-content-between px-1 col-12'>
-                    <label className='form-label' htmlFor="postReviewTextArea">Textual Review</label>
-                    <span className='text-secondary '>optional</span>
-                </div>
-                <textarea ref={review} id="postReviewTextArea" className='form-control text-start border-1 border-bottom' placeholder="Type your review here..." maxLength={512}></textarea>
-                <div className="invalid-feedback text-end" >
-                    Review must be less than 512 characters
-                </div>
-                <div className='d-flex flex-column flex-sm-row justify-content-between align-items-center py-2 px-4 col-12'>
-                    <span className='col-5 col-sm-5 col-md-3 fs-6 text-muted d-flex flex-row mb-2 mb-sm-0 justify-content-center'>
-                        <span>Rating:</span>
-                        <div className='d-flex flex-column col-4 mx-2 align-items-center'>
-                            <input ref={rating} id={'reviewRating'} type='number' min={1} max={10} className='fs-2 text-center fw-medium pe-1 text-dark col-12' required />
-                            <div className="invalid-feedback text-nowrap" >
-                                Rating must be 1-10
-                            </div>
+            <div className='position-relative'>
+                {
+                    (activeUser) ? '' :
+                        <div className='position-absolute top-50 start-50 translate-middle w-100 fs-5 text-secondary' style={{ zIndex: 1 }}>
+                            You must have an account to leave a review
+                            <br />
+                            <span className='fs-5 fw-normal'><a className='link-primary fs-4' href='/login'>Log into an existing account</a> or <a className='link-primary fs-4' href='/register'>Create a new one here</a></span>
                         </div>
-                        <span className=''>/10</span>
-                    </span>
-                    <div className='col-12 col-sm-5 col-lg-3 border-1'>
-                        <button className='btn btn-success col-12' type='submit'>Post</button>
+                }
+                <form ref={form} className={'d-flex flex-column align-items-center border border-top-0 col-12 p-2 needs-validation  ' + ((activeUser) ? '' : 'opacity-25')} onSubmit={validate} noValidate>
+                    <h5 className='text-muted fs-4'>Review it yourself</h5>
+                    <div className='d-flex flex-row justify-content-between px-1 col-12'>
+                        <label className='form-label' htmlFor="postReviewTextArea">Textual Review</label>
+                        <span className='text-secondary '>optional</span>
                     </div>
-                </div>
-            </form>
+                    <textarea ref={review} id="postReviewTextArea" className='form-control text-start border-1 border-bottom' placeholder="Type your review here..." maxLength={512} disabled={!activeUser}></textarea>
+                    <div className="invalid-feedback text-end" >
+                        Review must be less than 512 characters
+                    </div>
+                    <div className='d-flex flex-column flex-sm-row justify-content-between align-items-center py-2 px-4 col-12'>
+                        <span className='col-5 col-sm-5 col-md-3 fs-6 text-muted d-flex flex-row mb-2 mb-sm-0 justify-content-center'>
+                            <span>Rating:</span>
+                            <div className='d-flex flex-column col-4 mx-2 align-items-center'>
+                                <input ref={rating} id={'reviewRating'} type='number' min={1} max={10} className='fs-2 text-center fw-medium pe-1 text-dark col-12' required disabled={!activeUser} />
+                                <div className="invalid-feedback text-nowrap" >
+                                    Rating must be 1-10
+                                </div>
+                            </div>
+                            <span className=''>/10</span>
+                        </span>
+                        <div className='col-12 col-sm-5 col-lg-3 border-1'>
+                            {(activeUser) ? <button className='btn btn-success col-12' type='submit' >Post</button>
+                                : ''
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div >
         )
     }
 
     const validate = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        if (!activeUser) {
+            return
+        }
 
         review.current?.classList.remove('is-valid')
         review.current?.classList.remove('is-invalid')
