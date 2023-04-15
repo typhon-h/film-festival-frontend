@@ -2,13 +2,23 @@ import axios from "axios"
 import React from "react"
 import DirectorCard from "./DirectorCard"
 import Restricted from "../layouts/Restricted"
+import { useNavigate } from "react-router-dom"
 
 const ReviewsPanel = (props: any) => {
     const [reviews, setReviews] = React.useState<Review[]>([])
     const [timedOut, setTimedOut] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [errorFlag, setErrorFlag] = React.useState(false)
+    const [postErrorMessage, setPostErrorMessage] = React.useState("")
+    const [postErrorFlag, setPostErrorFlag] = React.useState(false)
     const [expanded, setExpanded] = React.useState(false);
+    const [submitted, setSubmitted] = React.useState<boolean>(false)
+    const navigate = useNavigate()
+
+
+    const form = React.useRef<HTMLFormElement>(null)
+    const review = React.useRef<HTMLTextAreaElement>(null)
+    const rating = React.useRef<HTMLInputElement>(null)
 
 
     React.useEffect(() => {
@@ -37,7 +47,6 @@ const ReviewsPanel = (props: any) => {
 
                 })
         }
-
         getReviews()
     }, [props.filmId])
 
@@ -56,7 +65,7 @@ const ReviewsPanel = (props: any) => {
 
     const display_reviews = () => {
         return reviews.map((review, index) =>
-            <div key={review.reviewerId} className={'d-flex flex-column border-bottom border-3 col-12 ' + ((index % 2 === 0) ? 'bg-body' : 'bg-light')}>
+            <div key={review.reviewerId} className={'d-flex flex-column border-bottom border-3 col-12 text-break ' + ((index % 2 === 0) ? 'bg-body' : 'bg-light')}>
                 {(review.review) ? <span className='w-100 p-2 fs-6 fst-italic text-start border-1 border-bottom'>"{review.review}"</span> : ''}
                 <div className='d-flex flex-row justify-content-between align-items-center py-2 px-4'>
                     <span className='col-3 fs-6 text-muted'><span className='fs-1 fw-medium pe-1 text-dark'>{review.rating}</span>/ 10</span>
@@ -93,22 +102,96 @@ const ReviewsPanel = (props: any) => {
 
     const review_form = () => {
         return (
-            <form className={'d-flex flex-column border border-top-0 col-12 p-2'}>
+            <form ref={form} className={'d-flex flex-column align-items-center border border-top-0 col-12 p-2 needs-validation'} onSubmit={validate} noValidate>
                 <h5 className='text-muted fs-4'>Review it yourself</h5>
-                <div className='d-flex flex-row justify-content-between px-1'>
+                <div className='d-flex flex-row justify-content-between px-1 col-12'>
                     <label className='form-label' htmlFor="postReviewTextArea">Textual Review</label>
                     <span className='text-secondary '>optional</span>
                 </div>
-                <textarea id="postReviewTextArea" className='form-control text-start border-1 border-bottom' placeholder="Optional..."></textarea>
-                <div className='d-flex flex-row justify-content-between align-items-center py-2 px-4'>
-                    <span className='col-5 col-md-3 fs-6 text-muted'>Rating: <input type='number' min={1} max={10} className='fs-2 text-center col-4 fw-medium pe-1 text-dark'></input>/ 10</span>
-                    <div className='col-5 col-sm-5 col-lg-3 border-1'>
-                        <button className='btn btn-success form-control' type='button'>Post</button>
+                <textarea ref={review} id="postReviewTextArea" className='form-control text-start border-1 border-bottom' placeholder="Type your review here..." maxLength={512}></textarea>
+                <div className="invalid-feedback text-end" >
+                    Review must be less than 512 characters
+                </div>
+                <div className='d-flex flex-column flex-sm-row justify-content-between align-items-center py-2 px-4 col-12'>
+                    <span className='col-5 col-sm-5 col-md-3 fs-6 text-muted d-flex flex-row mb-2 mb-sm-0 justify-content-center'>
+                        <span>Rating:</span>
+                        <div className='d-flex flex-column col-4 mx-2 align-items-center'>
+                            <input ref={rating} id={'reviewRating'} type='number' min={1} max={10} className='fs-2 text-center fw-medium pe-1 text-dark col-12' required />
+                            <div className="invalid-feedback text-nowrap" >
+                                Rating must be 1-10
+                            </div>
+                        </div>
+                        <span className=''>/10</span>
+                    </span>
+                    <div className='col-12 col-sm-5 col-lg-3 border-1'>
+                        <button className='btn btn-success col-12' type='submit'>Post</button>
                     </div>
                 </div>
             </form>
         )
     }
+
+    const validate = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        review.current?.classList.remove('is-valid')
+        review.current?.classList.remove('is-invalid')
+
+        rating.current?.classList.remove('is-valid')
+        rating.current?.classList.remove('is-invalid')
+
+        if (!form.current?.checkValidity()) {
+            form.current?.classList.add('was-validated')
+            setSubmitted(false)
+        } else {
+            form.current?.classList.remove('was-validated')
+            setSubmitted(true)
+        }
+    }
+
+    React.useEffect(() => {
+        if (!submitted) {
+            return
+        }
+
+        const postReview = () => {
+            axios.post(process.env.REACT_APP_DOMAIN + `/films/${props.filmId}/reviews`, {
+                rating: parseInt(rating.current?.value as string, 10),
+                ...(review.current?.value && { review: review.current?.value })
+            })
+                .then((response) => {
+                    navigate(0) // refresh page to load new review
+                }, (err) => {
+                    console.log(err)
+                    setSubmitted(false)
+
+                    switch (err.response.status) {
+                        case 400:
+                            review.current?.classList.add(((err.response.statusText as string).includes('data/review')) ? 'is-invalid' : 'is-valid')
+                            rating.current?.classList.add(((err.response.statusText as string).includes('data/rating')) ? 'is-invalid' : 'is-valid')
+                            break;
+                        case 403:
+                            setPostErrorFlag(true)
+                            setPostErrorMessage('Cannot review your own film or post a review on a film that has not been released')
+                            break
+                        case 401:
+                            setPostErrorFlag(true)
+                            setPostErrorMessage('Must be signed in to leave a review')
+                            break
+                        case 404:
+                            navigate(-1)
+                            break
+                        default:
+                            setPostErrorFlag(true)
+                            setPostErrorMessage(err.response.statusText)
+                            break
+                    }
+                })
+        }
+
+        postReview()
+
+    }, [navigate, props.filmId, submitted])
 
 
     return (
@@ -127,6 +210,11 @@ const ReviewsPanel = (props: any) => {
                 </div>
             </div>
             <Restricted blacklist={[props.directorId].concat(reviews.map((review) => review.reviewerId))}>
+                {(postErrorFlag) ?
+                    <div className="alert alert-danger" role="alert">
+                        {postErrorMessage}
+                    </div>
+                    : ''}
                 {review_form()}
             </Restricted>
         </div>
