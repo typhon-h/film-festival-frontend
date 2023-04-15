@@ -14,7 +14,7 @@ const SimilarFilms = (props: any) => {
                 setResult(
                     responses[1].data.films.concat(responses[0].data.films).filter((item: Film, index: number, arr: Film[]) =>
                         item.filmId !== props.filmId && arr.findIndex(film => film.filmId === item.filmId) === index)
-                )
+                ) // TODO: error handling
             })
         }
 
