@@ -32,8 +32,10 @@ const FilmView = (props: any) => {
         const buildQuery = () => {
             let query = "?"
 
-            query += `startIndex=${(page) ? page.startIndex : 0}`
-            query += `&count=${(page) ? page.count : 10}`
+            if (filmState !== 'myFilmsAll') {
+                query += `&startIndex=${(page) ? page.startIndex : 0}`
+                query += `&count=${(page) ? page.count : 10}`
+            }
 
             setIsSearch((searchParams.get('q')) ? true : false)
             query += (isSearch) ? `&q=${searchParams.get('q')}` : ''
@@ -77,10 +79,19 @@ const FilmView = (props: any) => {
             axios.all(requests)
                 .then((responses) => {
                     let result: Film[] = []
+                    let count: number = 0;
                     responses.forEach((response) => {
-                        result = result.concat(response.data.films).filter((item: Film, index: number, arr: Film[]) =>
-                            arr.findIndex(film => film.filmId === item.filmId) === index)
-
+                        result = result.concat(response.data.films).filter(
+                            (item: Film, index: number, arr: Film[]) => {
+                                if (arr.findIndex(film => film.filmId === item.filmId) === index) {
+                                    return true
+                                }
+                                else {
+                                    count--;
+                                    return false
+                                }
+                            })
+                        count += response.data.count
                     })
                     // if multiple requests are concatenated must do another sort at frontend
                     if (requests.length > 1) {
@@ -104,10 +115,16 @@ const FilmView = (props: any) => {
                                 result.sort((b, a) => a.releaseDate.localeCompare(b.releaseDate))
                                 break
                         }
+
+                        if (page) {
+                            result = result.slice(page?.startIndex, page?.startIndex + page?.count)
+                        } else {
+                            result = result.slice(0, 10)
+                        }
                     }
                     setErrorFlag(false)
                     setFilms(result)
-                    setNumFilms(result.length)
+                    setNumFilms(count)
                     setLoading(false)
                     clearTimeout(timer)
                     setTimedOut(false)
