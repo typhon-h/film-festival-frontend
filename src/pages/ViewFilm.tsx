@@ -286,7 +286,7 @@ const ViewFilm = (props: any) => {
                 </div>
 
                 <div className='d-flex flex-column mb-4 col-12 col-xxl-8'>
-                    <ReviewsPanel filmId={filmId} directorId={film.directorId} rating={film.rating} />
+                    <ReviewsPanel filmId={filmId} directorId={film.directorId} rating={film.rating} releaseDate={film.releaseDate} />
                 </div>
 
                 <div className='d-flex flex-column col-12 col-md-5 col-lg-8 col-xxl-6'>
