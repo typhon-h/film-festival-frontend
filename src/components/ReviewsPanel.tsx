@@ -1,6 +1,7 @@
 import axios from "axios"
 import React from "react"
 import DirectorCard from "./DirectorCard"
+import Restricted from "../layouts/Restricted"
 
 const ReviewsPanel = (props: any) => {
     const [reviews, setReviews] = React.useState<Review[]>([])
@@ -90,6 +91,25 @@ const ReviewsPanel = (props: any) => {
         }
     }
 
+    const review_form = () => {
+        return (
+            <form className={'d-flex flex-column border border-top-0 col-12 p-2'}>
+                <h5 className='text-muted fs-4'>Review it yourself</h5>
+                <div className='d-flex flex-row justify-content-between px-1'>
+                    <label className='form-label' htmlFor="postReviewTextArea">Textual Review</label>
+                    <span className='text-secondary '>optional</span>
+                </div>
+                <textarea id="postReviewTextArea" className='form-control text-start border-1 border-bottom' placeholder="Optional..."></textarea>
+                <div className='d-flex flex-row justify-content-between align-items-center py-2 px-4'>
+                    <span className='col-5 col-md-3 fs-6 text-muted'>Rating: <input type='number' min={1} max={10} className='fs-2 text-center col-4 fw-medium pe-1 text-dark'></input>/ 10</span>
+                    <div className='col-5 col-sm-5 col-lg-3 border-1'>
+                        <button className='btn btn-success form-control' type='button'>Post</button>
+                    </div>
+                </div>
+            </form>
+        )
+    }
+
 
     return (
         <div className="d-flex flex-column col-12">
@@ -106,6 +126,9 @@ const ReviewsPanel = (props: any) => {
                     {render_reviews()}
                 </div>
             </div>
+            <Restricted blacklist={[props.directorId].concat(reviews.map((review) => review.reviewerId))}>
+                {review_form()}
+            </Restricted>
         </div>
     )
 }
