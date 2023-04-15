@@ -82,6 +82,29 @@ const FilmView = (props: any) => {
                             arr.findIndex(film => film.filmId === item.filmId) === index)
 
                     })
+                    // if multiple requests are concatenated must do another sort at frontend
+                    if (requests.length > 1) {
+                        switch (searchParams.get('sortBy')) {
+                            case 'ALPHABETICAL_ASC':
+                                result.sort((a, b) => a.title.localeCompare(b.title))
+                                break
+                            case 'ALPHABETICAL_DESC':
+                                result.sort((b, a) => a.title.localeCompare(b.title))
+                                break
+                            case 'RATING_ASC':
+                                result.sort((a, b) => a.rating.toString().localeCompare(b.rating.toString()))
+                                break
+                            case 'RATING_DESC':
+                                result.sort((a, b) => a.rating.toString().localeCompare(b.rating.toString()))
+                                break
+                            case 'RELEASED_ASC':
+                                result.sort((a, b) => a.releaseDate.localeCompare(b.releaseDate))
+                                break
+                            case 'RELEASED_DESC':
+                                result.sort((b, a) => a.releaseDate.localeCompare(b.releaseDate))
+                                break
+                        }
+                    }
                     setErrorFlag(false)
                     setFilms(result)
                     setNumFilms(result.length)
