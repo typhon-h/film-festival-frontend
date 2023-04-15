@@ -21,3 +21,6 @@ Login
 
 Create
    - Image upload error is ignored (404 error is handled)
+
+Reviewing
+   - Allows reviews on the day of release (this is not in the past)
