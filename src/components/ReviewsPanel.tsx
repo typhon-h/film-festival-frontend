@@ -15,6 +15,7 @@ const ReviewsPanel = (props: any) => {
     const [expanded, setExpanded] = React.useState(false);
     const [submitted, setSubmitted] = React.useState<boolean>(false)
     const [activeUser] = React.useContext(AuthContext)
+    const [reviewsLoaded, setReviewsLoaded] = React.useState<boolean>(false)
     const navigate = useNavigate()
 
 
@@ -35,6 +36,7 @@ const ReviewsPanel = (props: any) => {
                     setReviews(response.data)
                     clearTimeout(timer)
                     setTimedOut(false)
+                    setReviewsLoaded(true)
                 }, (error) => {
                     console.log(error)
                     setErrorFlag(true)
@@ -239,7 +241,7 @@ const ReviewsPanel = (props: any) => {
                             {postErrorMessage}
                         </div>
                         : ''}
-                    {review_form()}
+                    {(reviewsLoaded) ? review_form() : ''}
                 </Restricted>
             </div>
         )
