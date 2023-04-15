@@ -8,6 +8,7 @@ import Filters from "./Filters";
 import Sort from "./Sort";
 import Pagination from "./Pagination";
 import Restricted from "../layouts/Restricted";
+import { AuthContext } from "../util/Contexts";
 
 const FilmView = (props: any) => {
 
@@ -20,6 +21,8 @@ const FilmView = (props: any) => {
     const [isSearch, setIsSearch] = React.useState(false)
     const [page, setPage] = React.useState<PageInfo>()
     const [numFilms, setNumFilms] = React.useState(0)
+    const [activeUser] = React.useContext(AuthContext)
+    const [filmState, setFilmState] = React.useState<string>('allFilms')
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
@@ -28,6 +31,7 @@ const FilmView = (props: any) => {
 
         const buildQuery = () => {
             let query = "?"
+
             query += `startIndex=${(page) ? page.startIndex : 0}`
             query += `&count=${(page) ? page.count : 10}`
 
@@ -54,11 +58,33 @@ const FilmView = (props: any) => {
         }
 
         const getFilms = () => {
-            axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery())
-                .then((response) => {
+            const requests = []
+            switch (filmState) {
+                case 'myFilmsDirected':
+                    requests.push(axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery() + `&directorId=${parseInt(activeUser, 10)}`))
+                    break;
+                case 'myFilmsReviewed':
+                    requests.push(axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery() + `&reviewerId=${parseInt(activeUser, 10)}`))
+                    break
+                case 'myFilmsAll':
+                    requests.push(axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery() + `&directorId=${parseInt(activeUser, 10)}`))
+                    requests.push(axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery() + `&reviewerId=${parseInt(activeUser, 10)}`))
+                    break
+                default:
+                    requests.push(axios.get(process.env.REACT_APP_DOMAIN + "/films" + buildQuery()))
+                    break
+            }
+            axios.all(requests)
+                .then((responses) => {
+                    let result: Film[] = []
+                    responses.forEach((response) => {
+                        result = result.concat(response.data.films).filter((item: Film, index: number, arr: Film[]) =>
+                            arr.findIndex(film => film.filmId === item.filmId) === index)
+
+                    })
                     setErrorFlag(false)
-                    setFilms(response.data.films)
-                    setNumFilms(response.data.count)
+                    setFilms(result)
+                    setNumFilms(result.length)
                     setLoading(false)
                     clearTimeout(timer)
                     setTimedOut(false)
@@ -79,7 +105,7 @@ const FilmView = (props: any) => {
         }
 
         getFilms()
-    }, [isSearch, searchParams, props.placeholder, page])
+    }, [isSearch, searchParams, props.placeholder, page, filmState, activeUser])
 
     const list_of_films = () => {
         return films.map((film: Film) =>
@@ -123,8 +149,55 @@ const FilmView = (props: any) => {
     const default_title = () => {
         return (
             <div className="my-1">
-                <h1 className="text-muted">All Films</h1>
+                <h1 className="text-muted">
+                    All Films
+                </h1>
             </div>
+        )
+    }
+
+    const user_films_menu = () => {
+        let prefix;
+        switch (filmState) {
+            case 'myFilmsDirected':
+                prefix = 'Directed'
+                break
+            case 'myFilmsReviewed':
+                prefix = 'Reviewed'
+                break
+            case 'allFilms':
+            case 'myFilmsAll':
+            default:
+                prefix = 'My'
+                break
+        }
+
+        return (
+            <ul className="nav nav-tabs nav-fill mb-3">
+                <li className="nav-item">
+                    <button className={"nav-link " + ((filmState === 'allFilms') ? 'active' : '')} onClick={() => { setFilmState('allFilms') }} aria-current="page">All Films</button>
+                </li>
+                <li className="nav-item dropdown">
+                    <button className={"nav-link dropdown-toggle " + ((filmState.includes('myFilms')) ? 'active' : '')} id="myFilmsDropdownButton" type='button' data-bs-toggle="dropdown" data-bs-auto-close="true">{prefix} Films</button>
+                    <ul className="dropdown-menu w-100 text-center" aria-labelledby="myFilmsDropdownButton" id="myFilmsDropdownMenu">
+                        <li><button className="dropdown-item" onClick={() => {
+                            document.getElementById('myFilmsDropdownMenu')?.classList.remove('show');
+                            document.getElementById('myFilmsDropdownButton')?.setAttribute('aria-expanded', 'false');
+                            setFilmState('myFilmsAll');
+                        }}>All</button></li>
+                        <li><button className="dropdown-item" onClick={() => {
+                            document.getElementById('myFilmsDropdownMenu')?.classList.remove('show');
+                            document.getElementById('myFilmsDropdownButton')?.setAttribute('aria-expanded', 'false');
+                            setFilmState('myFilmsDirected');
+                        }}>Directed</button></li>
+                        <li><button className="dropdown-item" onClick={() => {
+                            document.getElementById('myFilmsDropdownMenu')?.classList.remove('show');
+                            document.getElementById('myFilmsDropdownButton')?.setAttribute('aria-expanded', 'false');
+                            setFilmState('myFilmsReviewed');
+                        }}>Reviewed</button></li>
+                    </ul>
+                </li>
+            </ul>
         )
     }
 
@@ -175,6 +248,10 @@ const FilmView = (props: any) => {
             {(errorFlag) ? error_unexpected() : ''}
 
             {(isSearch) ? search_title() : default_title()}
+
+            <Restricted>
+                {user_films_menu()}
+            </Restricted>
 
             <div className={'d-flex flex-column-reverse flex-md-row align-items-end align-items-md-start justify-content-between mx-5 mb-2'}>
                 <Sort updateParams={setSearchParams} />
