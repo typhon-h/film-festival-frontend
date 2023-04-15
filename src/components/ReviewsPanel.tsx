@@ -107,10 +107,10 @@ const ReviewsPanel = (props: any) => {
             <div className='position-relative'>
                 {
                     (activeUser) ? '' :
-                        <div className='position-absolute top-50 start-50 translate-middle w-100 fs-5 text-secondary' style={{ zIndex: 1 }}>
+                        <div className='position-absolute top-50 start-50 translate-middle w-100 fs-5' style={{ zIndex: 1 }}>
                             You must have an account to leave a review
                             <br />
-                            <span className='fs-5 fw-normal'><a className='link-primary fs-4' href='/login'>Log into an existing account</a> or <a className='link-primary fs-4' href='/register'>Create a new one here</a></span>
+                            <span className='fs-5 fw-normal text-muted'><a className='link-primary fs-4' href='/login'>Log into an existing account</a> or <a className='link-primary fs-4' href='/register'>Create a new one here</a></span>
                         </div>
                 }
                 <form ref={form} className={'d-flex flex-column align-items-center border border-top-0 col-12 p-2 needs-validation  ' + ((activeUser) ? '' : 'opacity-25')} onSubmit={validate} noValidate>
