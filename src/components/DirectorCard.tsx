@@ -32,8 +32,8 @@ const DirectorCard = (props: any) => {
                     <img className={'mx-auto ' + (directorImageLoaded ? '' : 'd-none')} src={(directorImageLoaded) ? directorImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="} alt="Director Icon" style={{ objectFit: 'cover' }} />
                 </div>
                 <div className='d-flex flex-row col-9 justify-content-around flex-wrap'>
-                    <p className="mb-0">{props.director.firstName}</p>
-                    <p className="mb-0">{props.director.lastName}</p>
+                    <p className="mb-0 text-capitalize">{props.director.firstName}</p>
+                    <p className="mb-0 text-capitalize">{props.director.lastName}</p>
                 </div>
             </div>
         </div>
