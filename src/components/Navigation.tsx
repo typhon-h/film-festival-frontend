@@ -1,5 +1,5 @@
 import Restricted from "../layouts/Restricted";
-import { AuthContext } from "../util/Contexts";
+import { AuthContext, OnlineContext } from "../util/Contexts";
 import NavLink from "./NavLink";
 import default_profile_picture from "../assets/default_profile_picture.png";
 import axios from "axios";
@@ -10,6 +10,7 @@ const Navigation = () => {
     const [activeUser] = React.useContext(AuthContext)
     const [userImage, setUserImage] = React.useState<string>("");
     const [userImageLoaded, setUserImageLoaded] = React.useState<boolean>(false);
+    const [isOnline] = React.useContext(OnlineContext);
 
     React.useEffect(() => {
         const getUserImage = () => {
@@ -26,7 +27,7 @@ const Navigation = () => {
         }
 
         getUserImage()
-    }, [activeUser])
+    }, [activeUser, isOnline])
 
 
     return (

@@ -10,6 +10,7 @@ import ViewFilmPlaceholder from "./placeholder/ViewFilmPlaceholder"
 import SimilarFilms from "../components/SimilarFilms"
 import Restricted from "../layouts/Restricted"
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OnlineContext } from "../util/Contexts"
 
 
 const ViewFilm = (props: any) => {
@@ -24,25 +25,9 @@ const ViewFilm = (props: any) => {
     const [heroImage, setHeroImage] = React.useState<string>("");
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
-    const [isOnline, setIsOnline] = React.useState(navigator.onLine)
+    const [isOnline] = React.useContext(OnlineContext);
     const [deleteConfirmed, setDeleteConfirmed] = React.useState(false)
     const navigate = useNavigate()
-
-    // Handler modified to only 'trigger' on the change from offline>online to preserve page content
-    React.useEffect(() => {
-        const handleStatusChange = () => {
-            setIsOnline(navigator.onLine);
-        };
-
-        window.addEventListener("online", handleStatusChange)
-        window.addEventListener("offline", handleStatusChange)
-
-        return () => {
-            window.removeEventListener('online', handleStatusChange);
-            window.removeEventListener('offline', handleStatusChange);
-
-        }
-    }, [isOnline])
 
     React.useEffect(() => {
         const timer = setTimeout(() => {

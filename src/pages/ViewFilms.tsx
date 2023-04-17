@@ -1,24 +1,10 @@
 import React from "react";
 import FilmView from "../components/FilmView";
+import { OnlineContext } from "../util/Contexts";
 
 const ViewFilms = () => {
 
-    const [isOnline, setIsOnline] = React.useState(navigator.onLine)
-
-
-    // Handler modified to only 'trigger' on the change from offline>online to preserve page content
-    React.useEffect(() => {
-        const handleStatusChange = () => {
-            setIsOnline(navigator.onLine);
-        };
-
-        window.addEventListener("online", handleStatusChange)
-
-        return () => {
-            window.removeEventListener('online', handleStatusChange);
-        }
-    }, [isOnline])
-
+    const [isOnline] = React.useContext(OnlineContext)
 
     const error_offline = () => {
         return (

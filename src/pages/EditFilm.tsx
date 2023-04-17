@@ -2,7 +2,7 @@ import axios from "axios"
 import React from "react"
 import { useNavigate, useParams } from "react-router-dom";
 import NotFound from "./NotFound";
-import { AuthContext } from "../util/Contexts";
+import { AuthContext, OnlineContext } from "../util/Contexts";
 
 const EditFilm = () => {
     const navigate = useNavigate();
@@ -13,7 +13,7 @@ const EditFilm = () => {
     const [titleError, setTitleError] = React.useState<string>('Please enter a valid title less than 64 characters')
     const [releaseDateError, setReleaseDateError] = React.useState<string>('Please enter a date that is not in the past.')
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
-    const [isOnline, setIsOnline] = React.useState(navigator.onLine)
+    const [isOnline] = React.useContext(OnlineContext);
     const [notFoundFlag, setNotFoundFlag] = React.useState(false)
     const [timedOut, setTimedOut] = React.useState(false)
     const [loading, setLoading] = React.useState(true)
@@ -35,22 +35,6 @@ const EditFilm = () => {
             navigate(-1)
         }
     }, [activeUser, film, navigate])
-
-    // Handler modified to only 'trigger' on the change from offline>online to preserve page content
-    React.useEffect(() => {
-        const handleStatusChange = () => {
-            setIsOnline(navigator.onLine);
-        };
-
-        window.addEventListener("online", handleStatusChange)
-        window.addEventListener("offline", handleStatusChange)
-
-        return () => {
-            window.removeEventListener('online', handleStatusChange);
-            window.removeEventListener('offline', handleStatusChange);
-
-        }
-    }, [isOnline])
 
 
     React.useEffect(() => {
