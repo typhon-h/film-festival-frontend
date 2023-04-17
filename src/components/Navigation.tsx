@@ -1,7 +1,34 @@
 import Restricted from "../layouts/Restricted";
+import { AuthContext } from "../util/Contexts";
 import NavLink from "./NavLink";
+import default_profile_picture from "../assets/default_profile_picture.png";
+import axios from "axios";
+import React from "react";
 
 const Navigation = () => {
+
+    const [activeUser] = React.useContext(AuthContext)
+    const [userImage, setUserImage] = React.useState<string>("");
+    const [userImageLoaded, setUserImageLoaded] = React.useState<boolean>(false);
+
+    React.useEffect(() => {
+        const getUserImage = () => {
+            axios.get((process.env.REACT_APP_DOMAIN as string) + '/users/' + activeUser + '/image', { responseType: "arraybuffer" })
+                .then((response) => {
+                    setUserImage(`data: ${response.headers['content-type']}; base64, ${Buffer.from(response.data, 'binary').toString('base64')}`);
+                    setUserImageLoaded(true)
+                }, (error) => {
+                    if (error.code !== 'ERR_NETWORK') {
+                        setUserImage(default_profile_picture);
+                        setUserImageLoaded(true);
+                    }
+                })
+        }
+
+        getUserImage()
+    }, [activeUser])
+
+
     return (
         <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-light ">
             <div className="container">
@@ -28,11 +55,11 @@ const Navigation = () => {
                                 <NavLink href={'/login'}>Login</NavLink>
                             </Restricted>
                             <Restricted>
-                                <div className="dropdown-center d-flex flex-column justify-content-center align-items-center align-items-lg-end">
-                                    <button className="btn dropdown-toggle border-0 d-flex flex-row justify-content-center align-items-center col-4 col-lg-8 col-xl-6 col-xxl-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <div className='flex-column border rounded-circle overflow-hidden w-100 align-items-center d-none d-lg-flex'>
+                                <div className="dropdown-center d-flex flex-column justify-content-center align-items-center align-items-lg-end placeholder-glow">
+                                    <button className={"btn dropdown-toggle border-0 d-flex flex-row justify-content-center align-items-center col-4 col-lg-8 col-xl-6 col-xxl-5 "} type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div className={'flex-column border rounded-circle overflow-hidden w-100 align-items-center d-none d-lg-flex ' + (userImageLoaded ? '' : 'placeholder')}>
                                             <div className={'ratio ratio-1x1'} >
-                                                <img className={'mx-auto'} src="https://seng365.csse.canterbury.ac.nz/api/v1/users/1/image" alt="Film Hero" style={{ objectFit: 'cover' }} />
+                                                <img className={'mx-auto ' + (userImageLoaded ? '' : 'd-none')} src={(userImageLoaded) ? userImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII="} alt="Active User Icon" style={{ objectFit: 'cover' }} />
                                             </div>
                                         </div>
                                         <span className='d-lg-none'>My Account</span>
