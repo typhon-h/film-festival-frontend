@@ -23,14 +23,19 @@ const Navigation = () => {
                             <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                         </form>
 
-                        <ul className="navbar-nav col-2 justify-content-end mt-2 mt-lg-0 order-1 order-lg-2 position-relative">
+                        <ul className="navbar-nav justify-content-end mt-2 mt-lg-0 order-1 order-lg-2 col-12 col-lg-2 align-items-center">
                             <Restricted auth={false}>
                                 <NavLink href={'/login'}>Login</NavLink>
                             </Restricted>
                             <Restricted>
-                                <div className="dropdown-center d-flex flex-column align-items-center">
-                                    <button className="btn dropdown-toggle border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        My Account
+                                <div className="dropdown-center d-flex flex-column justify-content-center align-items-center align-items-lg-end">
+                                    <button className="btn dropdown-toggle border-0 d-flex flex-row justify-content-center align-items-center col-4 col-lg-8 col-xl-6 col-xxl-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div className='flex-column border rounded-circle overflow-hidden w-100 align-items-center d-none d-lg-flex'>
+                                            <div className={'ratio ratio-1x1'} >
+                                                <img className={'mx-auto'} src="https://seng365.csse.canterbury.ac.nz/api/v1/users/1/image" alt="Film Hero" style={{ objectFit: 'cover' }} />
+                                            </div>
+                                        </div>
+                                        <span className='d-lg-none'>My Account</span>
                                     </button>
                                     <ul className="dropdown-menu dropdown-menu-end text-center">
                                         <NavLink href={'/profile'}>View Profile</NavLink>
