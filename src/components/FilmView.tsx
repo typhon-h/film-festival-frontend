@@ -155,7 +155,7 @@ const FilmView = (props: any) => {
 
     const info_no_films = () => {
         return (
-            <div className="alert alert-info d-flex flex-row justify-content-center" role="alert">
+            <div className="alert alert-info d-flex flex-column justify-content-center" role="alert">
                 <div className='me-1'>No films match your request. Check your search and/or filters</div><Restricted> or go <a href="/films/create" className="alert-link">here</a> to add a film you have directed</Restricted>
             </div>
         )

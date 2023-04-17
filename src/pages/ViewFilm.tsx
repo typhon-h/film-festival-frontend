@@ -206,46 +206,48 @@ const ViewFilm = (props: any) => {
 
             <div className="d-flex flex-column align-items-center align-items-sm-center p-4 placeholder-glow">
                 <div className="d-flex flex-row col-12">
-                    <h1 className='fs-1 text-secondary mb-3 mx-auto'>{film.title}</h1>
-                    <Restricted whitelist={[film.directorId]}>
-                        <div className='d-flex flex-row'>
-                            {(film.numReviews === 0) ?
-                                <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit', { replace: true }) }}>Edit</button>
-                                :
-                                <OverlayTrigger placement="left" overlay={<Tooltip>Cannot edit film after a review has been placed</Tooltip>}>
-                                    <span className='d-block'>
-                                        <button className={'btn btn-outline-primary'} disabled>Edit</button>
-                                    </span>
-                                </OverlayTrigger>
-                            }
+                    <h1 className='fs-1 text-secondary ps-xxl-4 mb-3 col-8 col-md-9 col-lg-10 text-start text-break'>{film.title}</h1>
+                    <div className='col-4 col-md-3 col-lg-2'>
+                        <Restricted whitelist={[film.directorId]}>
+                            <div className='d-flex flex-column flex-sm-row justify-content-end'>
+                                {(film.numReviews === 0) ?
+                                    <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit', { replace: true }) }}>Edit</button>
+                                    :
+                                    <OverlayTrigger placement="left" overlay={<Tooltip>Cannot edit film after a review has been placed</Tooltip>}>
+                                        <span className='d-block'>
+                                            <button className={'btn btn-outline-primary'} disabled>Edit</button>
+                                        </span>
+                                    </OverlayTrigger>
+                                }
 
-                            <button className={'btn btn-danger ms-2'} type='button' data-bs-toggle='modal' data-bs-target='#deleteFilmModal'>Delete</button>
+                                <button className={'btn btn-danger mt-2 mt-sm-0 ms-sm-2'} type='button' data-bs-toggle='modal' data-bs-target='#deleteFilmModal'>Delete</button>
 
-                            <div className="modal fade" id={'deleteFilmModal'} tabIndex={-1} role="dialog" aria-labelledby={'deleteFilmModelLabel'} aria-hidden="true">
-                                <div className="modal-dialog" role="document">
-                                    <div className="modal-content">
-                                        <div className="modal-header">
-                                            <h5 className="modal-title" id={'deleteFilmModelLabel'}>Delete Film</h5>
-                                            <button type="button" className="btn close" data-bs-dismiss="modal" aria-label="Close">
-                                                <i className="bi bi-x-lg" aria-hidden='true'></i>
-                                            </button>
-                                        </div>
-                                        <div className="modal-body">
-                                            Are you sure that you want to delete the film <span className='text-danger'>{film?.title}</span>
-                                        </div>
-                                        <div className="modal-footer">
-                                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                                                Close
-                                            </button>
-                                            <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => { setDeleteConfirmed(true) }}>
-                                                Delete Film
-                                            </button>
+                                <div className="modal fade" id={'deleteFilmModal'} tabIndex={-1} role="dialog" aria-labelledby={'deleteFilmModelLabel'} aria-hidden="true">
+                                    <div className="modal-dialog" role="document">
+                                        <div className="modal-content">
+                                            <div className="modal-header">
+                                                <h5 className="modal-title" id={'deleteFilmModelLabel'}>Delete Film</h5>
+                                                <button type="button" className="btn close" data-bs-dismiss="modal" aria-label="Close">
+                                                    <i className="bi bi-x-lg" aria-hidden='true'></i>
+                                                </button>
+                                            </div>
+                                            <div className="modal-body">
+                                                Are you sure that you want to delete the film <span className='text-danger'>{film?.title}</span>
+                                            </div>
+                                            <div className="modal-footer">
+                                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Close
+                                                </button>
+                                                <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => { setDeleteConfirmed(true) }}>
+                                                    Delete Film
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Restricted>
+                        </Restricted>
+                    </div>
                 </div>
                 <div className='d-flex flex-column col-12 flex-lg-row  align-items-center justify-content-lg-between justify-content-xxl-center'>
                     <div className='d-flex flex-column col-12 col-sm-8 col-lg-4 col-xxl-4 mb-3 align-items-center me-xxl-5 img-thumbnail'>
