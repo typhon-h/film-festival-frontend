@@ -8,7 +8,7 @@ import React from "react";
 const Navigation = () => {
 
     const [activeUser] = React.useContext(AuthContext)
-    const [userImage, setUserImage] = React.useState<string>("");
+    const [userImage, setUserImage] = React.useState<string>(""); //TODO: possibly memoize this
     const [userImageLoaded, setUserImageLoaded] = React.useState<boolean>(false);
     const [isOnline] = React.useContext(OnlineContext);
 
