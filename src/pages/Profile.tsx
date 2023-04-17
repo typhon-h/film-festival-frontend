@@ -21,6 +21,11 @@ const Profile = () => {
     const [errorMessage, setErrorMessage] = React.useState("")
     const [isOnline] = React.useContext(OnlineContext);
     const [deleteConfirmed, setDeleteConfirmed] = React.useState(false)
+    const [newUserImage, setNewUserImage] = React.useState<File>()
+
+    const form = React.useRef<HTMLFormElement>(null)
+    const newUserImageUpload = React.useRef<HTMLInputElement>(null)
+    const frontEndFeedback = React.useRef<HTMLSpanElement>(null)
 
 
     React.useEffect(() => {
@@ -97,6 +102,7 @@ const Profile = () => {
                             setErrorFlag(true)
                             setErrorMessage(err.message)
                     }
+                    setDeleteConfirmed(false)
                 })
         }
 
@@ -105,6 +111,58 @@ const Profile = () => {
         }
 
     }, [deleteConfirmed, activeUser, navigate])
+
+
+    React.useEffect(() => {
+        const postImage = () => {
+            axios.put(process.env.REACT_APP_DOMAIN + `/users/${activeUser}/image`,
+                newUserImage, {
+                headers: {
+                    'Content-Type': newUserImage?.type
+                }
+            })
+                .then((response) => {
+                    navigate(0)
+                }, (err) => {
+                    switch (err.response.status) {
+                        case 400:
+                            if (frontEndFeedback.current) {
+                                frontEndFeedback.current.classList.replace('d-none', 'd-flex')
+                                frontEndFeedback.current.innerText = 'Uploaded image must be png, gif, jpg, or jpeg'
+                            }
+                            break
+                        case 401:
+                        case 403:
+                        case 404:
+                            navigate('/logout', { replace: true }) // Doesn't exist or no permission so user should not be on the page
+                            break
+                        default:
+                            setErrorFlag(true)
+                            setErrorMessage(err.response.statusText)
+                    }
+
+                })
+        }
+
+        if (newUserImage) {
+            postImage()
+        }
+
+    }, [activeUser, navigate, newUserImage])
+
+
+    const validate = () => {
+        if (form.current?.checkValidity()) {
+            if (newUserImageUpload.current?.files?.item(0)) {
+                setNewUserImage(newUserImageUpload.current.files.item(0) as File)
+            }
+        } else {
+            if (frontEndFeedback.current) {
+                frontEndFeedback.current.classList.replace('d-none', 'd-flex')
+                frontEndFeedback.current.innerText = 'Uploaded image must be png, gif, jpg, or jpeg'
+            }
+        }
+    }
 
 
 
@@ -204,14 +262,16 @@ const Profile = () => {
                                 ''
                             }
 
-
                         </div>
-                        <form id="change-profile-picture" action="@{my-profile}" method="post" encType="multipart/form-data" className="position-absolute bottom-0 start-0 h-25 w-50">
+                        <form ref={form} id="change-profile-picture" encType="multipart/form-data" className="position-absolute bottom-0 start-0 h-25 w-50">
                             <label htmlFor="upload-profile-picture" className="shadow-lg fs-4 btn btn-primary position-absolute top-50 start-50 translate-middle"><i className="bi bi-pencil-square"></i></label>
-                            <input type="file" name="image" id="upload-profile-picture"
-                                accept="image/svg+xml, image/png, image/jpeg" hidden />
+                            <input ref={newUserImageUpload} type="file" name="image" id="upload-profile-picture"
+                                onChange={validate}
+                                accept="image/svg+xml, image/png, image/jpeg" hidden required />
                         </form>
                     </div>
+
+                    <span ref={frontEndFeedback} className='text-danger mt-2 fw-bold d-none'></span>
                 </div>
 
                 <h1 className='fs-1 text-secondary mt-3 mx-auto text-break text-capitalize'>{userDetails?.firstName} {userDetails?.lastName}</h1>
