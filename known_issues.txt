@@ -2,7 +2,6 @@ View Films
     - All results briefly load before search
     - Pagination is not present in URL query - only benefit is under 1 'page' parameter
     - Some pages of results does not scroll to top
-    - Film images are squashed (objectFit cover)
 
  Filter Films
     - Cannot adjust filter criteria while films loading
@@ -25,6 +24,3 @@ Create
 
 Reviewing
    - Allows reviews on the day of release (this is not in the past)
-
-
-Restricted w-100 causing display issues across program
