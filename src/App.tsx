@@ -17,6 +17,7 @@ import Logout from './pages/Logout';
 import CreateFilm from './pages/CreateFilm';
 import EditFilm from './pages/EditFilm';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 
 function App() {
   const [activeUser, setActiveUser] = React.useState<number>(localStorage.getItem('activeUser') as unknown as number)
@@ -58,6 +59,7 @@ function App() {
                   <Route path="/login" element={<Protected auth={false}><Login /></Protected>} />
                   <Route path="/logout" element={<Protected><Logout /></Protected>} />
                   <Route path="/profile" element={<Protected><Profile /></Protected>}></Route>
+                  <Route path="/profile/edit" element={<Protected><EditProfile /></Protected>}></Route>
                   <Route path="/films" element={<ViewFilms />} />
                   <Route path="/films/:filmId" element={<ViewFilm />} />
                   <Route path="/films/create" element={<Protected><CreateFilm /></Protected>} />
