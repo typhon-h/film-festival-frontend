@@ -253,7 +253,7 @@ const ReviewsPanel = (props: any) => {
                 <span className='d-flex flex-column flex-md-row bg-light border justify-content-between align-items-center py-2 px-3 rounded-top text-reset text-decoration-none' data-bs-toggle="collapse" data-bs-target="#userReviews" aria-expanded="false" aria-controls="userReviews" id='reviewPanel'>
                     <span className='fs-4 text-start'>Reviews are unavailable until the film is released:</span>
                     <div className='d-flex flex-column'>
-                        <span className='fs-6 fw-light'><span className={'fs-3 fw-semibold pe-1 '}>{Math.ceil((Date.parse(props.releaseDate) - Date.now()) / (1000 * 3600 * 24))}</span> days left</span>
+                        <span className='fs-6 fw-light'><span className={'fs-3 fw-semibold pe-1 '}>{Math.ceil((Date.parse(props.releaseDate) - Date.now()) / (1000 * 3600 * 24)).toLocaleString()}</span> days left</span>
                     </div>
                 </span>
             </div>
