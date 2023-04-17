@@ -4,6 +4,7 @@ import NavLink from "./NavLink";
 import default_profile_picture from "../assets/default_profile_picture.png";
 import axios from "axios";
 import React from "react";
+import { Buffer } from "buffer";
 
 const Navigation = () => {
 
