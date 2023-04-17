@@ -23,12 +23,21 @@ const Navigation = () => {
                             <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                         </form>
 
-                        <ul className="navbar-nav mt-2 mt-lg-0 order-1 order-lg-2">
+                        <ul className="navbar-nav col-2 justify-content-end mt-2 mt-lg-0 order-1 order-lg-2 position-relative">
                             <Restricted auth={false}>
                                 <NavLink href={'/login'}>Login</NavLink>
                             </Restricted>
                             <Restricted>
-                                <NavLink href={'/logout'}>Logout</NavLink>
+                                <div className="dropdown-center d-flex flex-column align-items-center">
+                                    <button className="btn dropdown-toggle border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        My Account
+                                    </button>
+                                    <ul className="dropdown-menu dropdown-menu-end text-center">
+                                        <NavLink href={'/profile'}>View Profile</NavLink>
+                                        <li className="dropdown-divider"></li>
+                                        <NavLink href={'/logout'}>Logout</NavLink>
+                                    </ul>
+                                </div>
                             </Restricted>
                         </ul>
                     </div>
