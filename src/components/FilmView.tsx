@@ -215,7 +215,11 @@ const FilmView = (props: any) => {
         return (
             <ul className="nav nav-tabs nav-fill mb-3">
                 <li className="nav-item">
-                    <button className={"nav-link " + ((filmState === 'allFilms') ? 'active' : '')} onClick={() => { setFilmState('allFilms') }} aria-current="page">All Films</button>
+                    <button className={"nav-link " + ((filmState === 'allFilms') ? 'active' : '')} onClick={() => {
+                        document.getElementById('myFilmsDropdownMenu')?.classList.remove('show');
+                        document.getElementById('myFilmsDropdownButton')?.setAttribute('aria-expanded', 'false');
+                        setFilmState('allFilms');
+                    }} aria-current="page">All Films</button>
                 </li>
                 <li className="nav-item dropdown">
                     <button className={"nav-link dropdown-toggle " + ((filmState.includes('myFilms')) ? 'active' : '')} id="myFilmsDropdownButton" type='button' data-bs-toggle="dropdown" data-bs-auto-close="true">{prefix} Films</button>
