@@ -10,9 +10,9 @@ type User = {
     /**
      * User first name as defined when created
      */
-    first_name: string,
+    firstName: string,
     /**
      * User last name as defined when created
      */
-    last_name: string
+    lastName: string
 }
