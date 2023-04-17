@@ -98,7 +98,7 @@ const ViewFilm = (props: any) => {
         const remove = () => {
             axios.delete(process.env.REACT_APP_DOMAIN + `/films/${film?.filmId}`)
                 .then((response) => {
-                    navigate('/films') // TODO: maybe navigate to my films
+                    navigate('/films')
                 }, (err) => {
                     switch (err.response.status) {
                         case 401:

@@ -20,6 +20,8 @@ const Profile = () => {
     const [loading, setLoading] = React.useState(true)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [isOnline] = React.useContext(OnlineContext);
+    const [deleteConfirmed, setDeleteConfirmed] = React.useState(false)
+
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
@@ -76,6 +78,35 @@ const Profile = () => {
     }, [activeUser, isOnline, loading])
 
 
+    React.useEffect(() => {
+        const remove = () => {
+            axios.delete(process.env.REACT_APP_DOMAIN + `/users/${activeUser}/image`)
+                .then((response) => {
+                    navigate(0) // Refresh
+                }, (err) => {
+                    switch (err.response.status) {
+                        case 401:
+                        case 403:
+                            navigate('/logout', { replace: true }) // Doesn't exist or no permission so user should not be on the page
+                            break
+                        case 404:
+                            setErrorFlag(true)
+                            setErrorMessage("No profile picture exists to delete")
+                            break
+                        default:
+                            setErrorFlag(true)
+                            setErrorMessage(err.message)
+                    }
+                })
+        }
+
+        if (deleteConfirmed) {
+            remove()
+        }
+
+    }, [deleteConfirmed, activeUser, navigate])
+
+
 
     const error_offline = () => {
         return (
@@ -130,15 +161,57 @@ const Profile = () => {
             {(errorFlag) ? error_unexpected() : ''}
 
             <div className="d-flex flex-column align-items-center align-items-sm-center p-4 placeholder-glow">
-                {/* edit button */}
+                <div className="d-flex flex-row col-12 justify-content-end">
+                    <div className='d-flex flex-row'>
+                        <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit</button>
+                    </div>
+                </div>
                 <div className='d-flex flex-column col-6 align-items-center'>
                     <div className='d-flex flex-column col-12 col-sm-8 col-lg-6 col-xxl-5 align-items-center position-relative'>
                         <div className={'ratio ratio-1x1 border rounded-circle overflow-hidden ' + (userImageLoaded ? '' : 'placeholder')} >
                             <img className={'mx-auto ratio ratio-1x1 ' + ((!userImageLoaded) ? 'placeholder' : '')} src={(userImageLoaded ? userImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Film Hero" style={{ objectFit: 'cover' }} />
                         </div>
-                    </div>
 
-                    {/* edit image buttons */}
+                        <div className="position-absolute bottom-0 end-0 h-25 w-50">
+                            {(userImage && userImage !== default_profile_picture) ?
+                                <div>
+                                    <button className="shadow-lg fs-4 btn btn-danger position-absolute top-50 start-50 translate-middle" type='button' data-bs-toggle='modal' data-bs-target='#deleteProfilePictureModal'><i className="bi bi-trash3"></i></button>
+                                    <div className="modal fade" id={'deleteProfilePictureModal'} tabIndex={-1} role="dialog" aria-labelledby={'deleteProfilePictureModelLabel'} aria-hidden="true">
+                                        <div className="modal-dialog" role="document">
+                                            <div className="modal-content">
+                                                <div className="modal-header">
+                                                    <h5 className="modal-title" id={'deleteProfilePictureModelLabel'}>Delete Profile Picture</h5>
+                                                    <button type="button" className="btn close" data-bs-dismiss="modal" aria-label="Close">
+                                                        <i className="bi bi-x-lg" aria-hidden='true'></i>
+                                                    </button>
+                                                </div>
+                                                <div className="modal-body">
+                                                    Are you sure that you want to delete the profile picture?
+                                                </div>
+                                                <div className="modal-footer">
+                                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                                                        Close
+                                                    </button>
+                                                    <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => { setDeleteConfirmed(true) }}>
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                :
+                                ''
+                            }
+
+
+                        </div>
+                        <form id="change-profile-picture" action="@{my-profile}" method="post" encType="multipart/form-data" className="position-absolute bottom-0 start-0 h-25 w-50">
+                            <label htmlFor="upload-profile-picture" className="shadow-lg fs-4 btn btn-primary position-absolute top-50 start-50 translate-middle"><i className="bi bi-pencil-square"></i></label>
+                            <input type="file" name="image" id="upload-profile-picture"
+                                accept="image/svg+xml, image/png, image/jpeg" hidden />
+                        </form>
+                    </div>
                 </div>
 
                 <h1 className='fs-1 text-secondary mt-3 mx-auto text-break text-capitalize'>{userDetails?.firstName} {userDetails?.lastName}</h1>
