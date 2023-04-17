@@ -32,7 +32,7 @@ const Profile = () => {
                 .then((response) => {
                     setErrorFlag(false)
                     setUserDetails(response.data)
-                    if (!response.data.email) {
+                    if (response.data.email === undefined) {
                         navigate('/logout', { replace: true })
                     }
                     setLoading(false)
