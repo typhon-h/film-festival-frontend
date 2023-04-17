@@ -50,7 +50,7 @@ const FilmCard = (props: any) => {
             </div>
 
             <div className="card-body d-flex flex-column justify-content-around align-items-center col-lg-7 col-xl-3">
-                <h5 className="card-title display text-break text-center">{props.film.title}</h5>
+                <h5 className="card-title display text-break text-center text-capitalize">{props.film.title}</h5>
 
                 <div className="d-flex flex-column flex-md-row justify-content-around p-2 mb-2">
                     <div className="d-flex flex-column mb-3 me-3">

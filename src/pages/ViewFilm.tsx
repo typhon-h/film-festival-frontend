@@ -206,7 +206,7 @@ const ViewFilm = (props: any) => {
 
             <div className="d-flex flex-column align-items-center align-items-sm-center p-4 placeholder-glow">
                 <div className="d-flex flex-row col-12">
-                    <h1 className='fs-1 text-secondary ps-xxl-4 mb-3 col-8 col-md-9 col-lg-10 text-start text-break'>{film.title}</h1>
+                    <h1 className='fs-1 text-secondary ps-xxl-4 mb-3 col-8 col-md-9 col-lg-10 text-start text-capitalize text-break'>{film.title}</h1>
                     <div className='col-4 col-md-3 col-lg-2'>
                         <Restricted whitelist={[film.directorId]}>
                             <div className='d-flex flex-column flex-sm-row justify-content-end'>
@@ -232,7 +232,7 @@ const ViewFilm = (props: any) => {
                                                 </button>
                                             </div>
                                             <div className="modal-body">
-                                                Are you sure that you want to delete the film <span className='text-danger'>{film?.title}</span>
+                                                Are you sure that you want to delete the film <span className='text-danger text-capitalize'>{film?.title}</span>
                                             </div>
                                             <div className="modal-footer">
                                                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
