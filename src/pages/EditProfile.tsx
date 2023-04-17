@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 const EditProfile = () => {
+    const navigate = useNavigate();
     return (
         <div>
             {/* {(errorFlag) ?
@@ -109,7 +112,8 @@ const EditProfile = () => {
                     </div>
 
                     <div className="d-flex flex-column-reverse flex-lg-row justify-content-between">
-                        <button type="reset" className="btn btn-outline-secondary col-12 col-lg-5">Reset</button>
+                        {/* disabled={loading || submitted || !isOnline} */}
+                        <button type="button" onClick={() => { navigate('/profile', { replace: true }) }} className="btn btn-outline-secondary col-12 col-lg-5" >Cancel</button>
                         <button type="submit" className="btn btn-primary col-12 col-lg-5 mb-2 mb-lg-0">Update</button>
                     </div>
                 </form >
