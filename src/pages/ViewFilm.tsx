@@ -21,7 +21,7 @@ const ViewFilm = (props: any) => {
     const [notFoundFlag, setNotFoundFlag] = React.useState(false)
     const [loading, setLoading] = React.useState(true)
     const [errorMessage, setErrorMessage] = React.useState("")
-    const [genre, setGenre] = React.useState<Genre>({ genreId: 0, name: "Unknown" });
+    const [genre, setGenre] = React.useState<Genre>();
     const [heroImage, setHeroImage] = React.useState<string>("");
     const [genreLoaded, setGenreLoaded] = React.useState<boolean>(false);
     const [heroImageLoaded, setHeroImageLoaded] = React.useState<boolean>(false);
@@ -71,12 +71,13 @@ const ViewFilm = (props: any) => {
                     setGenreLoaded(true)
                 }, (error) => {
                     console.log(error)
+                    setGenreLoaded(true)
                     // Genre has default value from useState
                 })
         }
 
         getGenre()
-    }, [film])
+    }, [film, isOnline])
 
     React.useEffect(() => {
         const getHeroImage = () => {
@@ -132,7 +133,7 @@ const ViewFilm = (props: any) => {
                 <div className='d-flex flex-column justify-content-start'>
                     <div className='d-flex flex-row justify-content-between'>
                         <p className='col-5 text-end'>Genre:</p>
-                        <p className={'col-5 text-start ' + (genreLoaded ? '' : 'placeholder')}>{(genre) ? genre.name : ''}</p>
+                        <p className={'col-5 text-start ' + (genreLoaded ? '' : 'placeholder')}>{(genreLoaded) ? genre?.name : genre?.genreId}</p>
                     </div>
                     <div className='d-flex flex-row justify-content-between'>
                         <p className='col-5 text-end'>Age Rating:</p>
