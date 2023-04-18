@@ -17,8 +17,9 @@ const EditProfile = () => {
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [emailError, setEmailError] = React.useState<string>("Please enter a valid email")
-    // const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
-    // const [newPasswordVisible, setNewPasswordVisible] = React.useState<boolean>(false)
+    const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
+    const [newPasswordVisible, setNewPasswordVisible] = React.useState<boolean>(false)
+    const [expanded, setExpanded] = React.useState<boolean>(false)
 
 
 
@@ -26,6 +27,9 @@ const EditProfile = () => {
     const firstName = React.useRef<HTMLInputElement>(null)
     const lastName = React.useRef<HTMLInputElement>(null)
     const email = React.useRef<HTMLInputElement>(null)
+    const password = React.useRef<HTMLInputElement>(null)
+    const newPassword = React.useRef<HTMLInputElement>(null)
+
 
 
     React.useEffect(() => {
@@ -76,6 +80,12 @@ const EditProfile = () => {
 
         email.current?.classList.remove('is-valid')
         email.current?.classList.remove('is-invalid')
+
+        password.current?.classList.remove('is-valid')
+        password.current?.classList.remove('is-invalid')
+
+        newPassword.current?.classList.remove('is-valid')
+        newPassword.current?.classList.remove('is-invalid')
 
         if (!form.current?.checkValidity()) {
             form.current?.classList.add('was-validated')
@@ -145,6 +155,12 @@ const EditProfile = () => {
         edit()
     }, [activeUser, navigate, submitted, userDetails])
 
+    React.useEffect(() => {
+        // Re-renders drop down to update button text arrow direction
+        return;
+
+    }, [expanded])
+
     const error_offline = () => {
         return (
             <div className="alert alert-danger" role="alert">
@@ -171,6 +187,10 @@ const EditProfile = () => {
 
     if (notFoundFlag) {
         return <NotFound />
+    }
+
+    const toggleExpanded = () => {
+        setExpanded(document.getElementById('changePasswordToggle')?.ariaExpanded === 'true');
     }
 
     return (
@@ -233,6 +253,46 @@ const EditProfile = () => {
                         </div>
                     </div>
 
+
+                    <button onClick={toggleExpanded} id="changePasswordToggle" className="btn text-primary mb-3 text-start fs-4 border-0" type="button" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
+                        <i className={'bi bi-caret-' + ((expanded) ? 'down' : 'right')}></i> Change Password
+                    </button>
+                    <div className='collapse' id="changePassword">
+                        <div className='d-flex flex-column col-12 align-items-start mb-3 '>
+                            <div className='d-flex flex-row col-12 justify-content-between'>
+                                <label htmlFor="editPassword" className="form-label">Current Password</label>
+                            </div>
+
+                            <div className="d-flex flex-row col-12 input-group mb-3">
+                                <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="editPassword" minLength={6} maxLength={64} />
+                                <button onClick={() => { setPasswordVisible(!passwordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showPassword" ><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                                <div className="valid-feedback text-end">
+                                    Great!
+                                </div>
+                                <div className="invalid-feedback text-end">
+                                    Password must be between 6-64 characters
+                                </div>
+                            </div>
+
+                            <div className='d-flex flex-row col-12 justify-content-between'>
+                                <label htmlFor="editPassword" className="form-label">New Password</label>
+                            </div>
+                            <div className="d-flex flex-row col-12 input-group mb-3">
+                                <input ref={newPassword} type={(newPasswordVisible) ? 'text' : 'password'} className="form-control" id="editNewPassword" minLength={6} maxLength={64} />
+                                <button onClick={() => { setNewPasswordVisible(!newPasswordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showNewPassword" ><i className={"bi bi-eye-" + ((!newPasswordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                                <div className="valid-feedback text-end">
+                                    Great!
+                                </div>
+                                <div className="invalid-feedback text-end">
+                                    Passwords must match
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+
                     <div className="d-flex flex-column-reverse flex-lg-row justify-content-between">
                         <button type="button" onClick={() => { navigate('/profile', { replace: true }) }} className="btn btn-outline-secondary col-12 col-lg-5" disabled={loading || submitted || !isOnline}>Cancel</button>
                         <button type="submit" className="btn btn-primary col-12 col-lg-5 mb-2 mb-lg-0" disabled={loading || submitted || (!isOnline)}>Update</button>
@@ -242,43 +302,5 @@ const EditProfile = () => {
         </div >
     )
 }
-
-
-
-// const password = React.useRef<HTMLInputElement>(null)
-// const newPassword = React.useRef<HTMLInputElement>(null)
-{/* <span className='align-self-start fs-4 mb-2'>Change Password</span>
-                    <div className='d-flex flex-column col-12 align-items-start mb-3'>
-                        <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="editPassword" className="form-label">Current Password</label>
-                        </div>
-
-                        <div className="d-flex flex-row col-12 input-group mb-3">
-                            <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="editPassword" minLength={6} maxLength={64} />
-                            <button onClick={() => { setPasswordVisible(!passwordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showPassword" ><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
-                            <div className="valid-feedback text-end">
-                                Great!
-                            </div>
-                            <div className="invalid-feedback text-end">
-                                Password must be between 6-64 characters
-                            </div>
-                        </div>
-
-                        <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="editPassword" className="form-label">New Password</label>
-                        </div>
-                        <div className="d-flex flex-row col-12 input-group mb-3">
-                            <input ref={newPassword} type={(newPasswordVisible) ? 'text' : 'password'} className="form-control" id="editNewPassword" minLength={6} maxLength={64} />
-                            <button onClick={() => { setNewPasswordVisible(!newPasswordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showNewPassword" ><i className={"bi bi-eye-" + ((!newPasswordVisible) ? 'slash-' : '') + "fill"}></i></button>
-                            <div className="valid-feedback text-end">
-                                Great!
-                            </div>
-                            <div className="invalid-feedback text-end">
-                                Passwords must match
-                            </div>
-                        </div>
-
-
-                    </div> */}
 
 export default EditProfile
