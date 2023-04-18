@@ -2,19 +2,23 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext, OnlineContext } from "../util/Contexts";
 import React from "react";
 import axios from "axios";
+import NotFound from "./NotFound";
 
 const EditProfile = () => {
     const navigate = useNavigate();
     const [activeUser] = React.useContext(AuthContext)
     const [userDetails, setUserDetails] = React.useState<User>()
+    const [submitted, setSubmitted] = React.useState<boolean>(false)
     const [timedOut, setTimedOut] = React.useState(false)
     const [notFoundFlag, setNotFoundFlag] = React.useState(false)
+    const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
+    const [isOnline] = React.useContext(OnlineContext)
     const [loading, setLoading] = React.useState(true)
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
-    const [isOnline] = React.useContext(OnlineContext)
-    const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
-    const [confirmPasswordVisible, setConfirmPasswordVisible] = React.useState<boolean>(false)
+    const [emailError, setEmailError] = React.useState<string>("Please enter a valid email")
+    // const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
+    // const [newPasswordVisible, setNewPasswordVisible] = React.useState<boolean>(false)
 
 
 
@@ -22,8 +26,6 @@ const EditProfile = () => {
     const firstName = React.useRef<HTMLInputElement>(null)
     const lastName = React.useRef<HTMLInputElement>(null)
     const email = React.useRef<HTMLInputElement>(null)
-    const password = React.useRef<HTMLInputElement>(null)
-    const confirmPassword = React.useRef<HTMLInputElement>(null)
 
 
     React.useEffect(() => {
@@ -64,38 +66,138 @@ const EditProfile = () => {
     }, [activeUser, isOnline, navigate])
 
 
+    const validate = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        firstName.current?.classList.remove('is-valid')
+        firstName.current?.classList.remove('is-invalid')
+
+        lastName.current?.classList.remove('is-valid')
+        lastName.current?.classList.remove('is-invalid')
+
+        email.current?.classList.remove('is-valid')
+        email.current?.classList.remove('is-invalid')
+
+        if (!form.current?.checkValidity()) {
+            form.current?.classList.add('was-validated')
+            setSubmitted(false)
+        } else {
+            form.current?.classList.remove('was-validated')
+            setSubmitted(true)
+        }
+    }
 
 
+
+
+
+    React.useEffect(() => {
+        if (!submitted) {
+            return
+        }
+
+        setConnectionFlag(false)
+
+        const edit = () => {
+            axios.patch(process.env.REACT_APP_DOMAIN + `/users/${activeUser}`, {
+                ...(firstName.current?.value !== userDetails?.firstName && { firstName: firstName.current?.value }),
+                ...(lastName.current?.value !== userDetails?.lastName && { lastName: lastName.current?.value }),
+                ...(email.current?.value !== userDetails?.email && { email: email.current?.value }),
+
+            }).then((response) => {
+                navigate('/profile', { replace: true })
+            }, (err) => {
+                console.log(err)
+                setSubmitted(false)
+
+                if (err.code === 'ERR_NETWORK') {
+                    setConnectionFlag(true)
+                    return
+                }
+
+                switch (err.response.status) {
+                    case 401:
+                    case 404:
+                        navigate('/logout', { replace: true })
+                        break
+                    case 400:
+                        firstName.current?.classList.add(((err.response.statusText as string).includes('data/firstName')) ? 'is-invalid' : 'is-valid')
+                        lastName.current?.classList.add(((err.response.statusText as string).includes('data/lastName')) ? 'is-invalid' : 'is-valid')
+                        email.current?.classList.add(((err.response.statusText as string).includes('data/email')) ? 'is-invalid' : 'is-valid')
+                        setEmailError('Please enter a valid email')
+
+                        break;
+                    case 403:
+                        if ((err.response.statusText as string).toLowerCase().includes('exists')) { //TODO: Morgan API does not check for this??
+                            email.current?.classList.add('is-invalid')
+                            setEmailError('Email already in use')
+                        } else {
+                            navigate('/logout', { replace: true })
+                        }
+                        break
+                    default:
+                        setErrorFlag(true)
+                        setErrorMessage(err.response.statusText)
+                        break
+                }
+            })
+        }
+
+        edit()
+    }, [activeUser, navigate, submitted, userDetails])
+
+    const error_offline = () => {
+        return (
+            <div className="alert alert-danger" role="alert">
+                We are having trouble connecting to the internet. Check your network settings or click <a href={window.location.href} className="alert-link">here</a> to try again.
+            </div>
+        )
+    }
+
+    const error_timed_out = () => {
+        return (
+            <div className="alert alert-warning" role="alert">
+                Slow network connection. Please check your network or wait while we process your request
+            </div>
+        )
+    }
+
+    const error_unexpected = () => {
+        return (
+            <div className="alert alert-danger" role="alert">
+                {errorMessage}
+            </div>
+        )
+    }
+
+    if (notFoundFlag) {
+        return <NotFound />
+    }
 
     return (
-        <div>
-            {/* {(errorFlag) ?
-                <div className="alert alert-danger" role="alert">
-                    An unexpected error occurred. Please try again
-                </div>
-                : ''
-            } */}
+        <div className='d-flex flex-column col-12'>
 
-            {/* {(connectionFlag) ?
-                <div className="alert alert-danger" role="alert">
-                    Unable to connect to the internet. Please try again
-                </div>
-                : ''} */}
+            {(errorFlag) ? error_unexpected() : ''}
+            {(timedOut && isOnline) ? error_timed_out() : ''}
+            {(connectionFlag || !isOnline) ? error_offline() : ''}
 
-            <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100' >
+            <div className={"spinner-border position-absolute align-self-center " + (((loading && isOnline) || submitted) ? 'd-flex' : 'd-none')} style={{ width: '4rem', height: '4rem', top: '40%' }} role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>
+
+            <div className={'d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100 ' + ((loading || submitted || !isOnline) ? 'opacity-25' : '')} >
 
                 <div className='mb-3'>
                     <h1>Edit Profile</h1>
                 </div>
-                {/*   onSubmit={validate}*/}
-                <form ref={form} className='d-flex flex-column col-10 col-md-6 ' id='editForm' noValidate>
+
+                <form ref={form} className='d-flex flex-column col-10 col-md-6' onSubmit={validate} id='editForm' noValidate>
 
                     <div className="d-flex flex-column flex-lg-row align-items-start justify-content-lg-between">
                         <div className='d-flex flex-column col-12 col-lg-5 align-items-start mb-3'>
                             <div className='d-flex flex-row col-12 justify-content-between'>
                                 <label htmlFor="editFName" className="form-label">First Name</label>
                             </div>
-                            <input ref={firstName} type="text" className="form-control" value={userDetails?.firstName} id="editFName" maxLength={64} placeholder={'Jane'} aria-describedby={'editFNameInvalid'} autoFocus={true} required />
+                            <input ref={firstName} type="text" className="form-control" defaultValue={userDetails?.firstName} id="editFName" maxLength={64} aria-describedby={'editFNameInvalid'} autoFocus={true} required disabled={loading || submitted || !isOnline} />
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
@@ -108,7 +210,7 @@ const EditProfile = () => {
                             <div className='d-flex flex-row col-12 justify-content-between'>
                                 <label htmlFor="editLName" className="form-label">Last Name</label>
                             </div>
-                            <input ref={lastName} type="text" className="form-control" value={userDetails?.lastName} id="editLName" maxLength={64} placeholder={'Doe'} required />
+                            <input ref={lastName} type="text" className="form-control" defaultValue={userDetails?.lastName} id="editLName" maxLength={64} required disabled={loading || submitted || !isOnline} />
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
@@ -122,22 +224,37 @@ const EditProfile = () => {
                         <div className='d-flex flex-row col-12 justify-content-between'>
                             <label htmlFor="editEmail" className="form-label">Email</label>
                         </div>
-                        <input ref={email} type="email" className="form-control" value={userDetails?.email} id="editEmail" maxLength={256} placeholder={'jane.doe@email.com'} required />
+                        <input ref={email} type="email" className="form-control" defaultValue={userDetails?.email} id="editEmail" maxLength={256} required disabled={loading || submitted || !isOnline} />
                         <div className="valid-feedback text-end">
                             Great!
                         </div>
                         <div className="invalid-feedback text-end">
-                            {/* {emailError} */}
+                            {emailError}
                         </div>
                     </div>
 
+                    <div className="d-flex flex-column-reverse flex-lg-row justify-content-between">
+                        <button type="button" onClick={() => { navigate('/profile', { replace: true }) }} className="btn btn-outline-secondary col-12 col-lg-5" disabled={loading || submitted || !isOnline}>Cancel</button>
+                        <button type="submit" className="btn btn-primary col-12 col-lg-5 mb-2 mb-lg-0" disabled={loading || submitted || (!isOnline)}>Update</button>
+                    </div>
+                </form >
+            </div >
+        </div >
+    )
+}
+
+
+
+// const password = React.useRef<HTMLInputElement>(null)
+// const newPassword = React.useRef<HTMLInputElement>(null)
+{/* <span className='align-self-start fs-4 mb-2'>Change Password</span>
                     <div className='d-flex flex-column col-12 align-items-start mb-3'>
                         <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="editPassword" className="form-label">Password</label>
+                            <label htmlFor="editPassword" className="form-label">Current Password</label>
                         </div>
 
                         <div className="d-flex flex-row col-12 input-group mb-3">
-                            <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="editPassword" minLength={6} maxLength={64} required />
+                            <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="editPassword" minLength={6} maxLength={64} />
                             <button onClick={() => { setPasswordVisible(!passwordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showPassword" ><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
                             <div className="valid-feedback text-end">
                                 Great!
@@ -148,11 +265,11 @@ const EditProfile = () => {
                         </div>
 
                         <div className='d-flex flex-row col-12 justify-content-between'>
-                            <label htmlFor="editPassword" className="form-label">Confirm Password</label>
+                            <label htmlFor="editPassword" className="form-label">New Password</label>
                         </div>
                         <div className="d-flex flex-row col-12 input-group mb-3">
-                            <input ref={confirmPassword} type={(confirmPasswordVisible) ? 'text' : 'password'} className="form-control" id="editConfirmPassword" minLength={6} maxLength={64} required />
-                            <button onClick={() => { setConfirmPasswordVisible(!confirmPasswordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showConfirmPassword" ><i className={"bi bi-eye-" + ((!confirmPasswordVisible) ? 'slash-' : '') + "fill"}></i></button>
+                            <input ref={newPassword} type={(newPasswordVisible) ? 'text' : 'password'} className="form-control" id="editNewPassword" minLength={6} maxLength={64} />
+                            <button onClick={() => { setNewPasswordVisible(!newPasswordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showNewPassword" ><i className={"bi bi-eye-" + ((!newPasswordVisible) ? 'slash-' : '') + "fill"}></i></button>
                             <div className="valid-feedback text-end">
                                 Great!
                             </div>
@@ -162,17 +279,6 @@ const EditProfile = () => {
                         </div>
 
 
-                    </div>
-
-                    <div className="d-flex flex-column-reverse flex-lg-row justify-content-between">
-                        {/* disabled={loading || submitted || !isOnline} */}
-                        <button type="button" onClick={() => { navigate('/profile', { replace: true }) }} className="btn btn-outline-secondary col-12 col-lg-5" >Cancel</button>
-                        <button type="submit" className="btn btn-primary col-12 col-lg-5 mb-2 mb-lg-0">Update</button>
-                    </div>
-                </form >
-            </div >
-        </div >
-    )
-}
+                    </div> */}
 
 export default EditProfile

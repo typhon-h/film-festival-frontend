@@ -74,7 +74,7 @@ const Login = () => {
     return (
         <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100'>
             {(connectionFlag || !isOnline) ?
-                <div className="alert alert-danger" role="alert">
+                <div className="alert alert-danger col-12" role="alert">
                     Unable to connect to the internet. Please try again
                 </div>
                 : ''}
