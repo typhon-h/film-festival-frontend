@@ -91,8 +91,16 @@ const EditProfile = () => {
             form.current?.classList.add('was-validated')
             setSubmitted(false)
         } else {
-            form.current?.classList.remove('was-validated')
-            setSubmitted(true)
+            if (password.current?.value && !newPassword.current?.value) {
+                form.current?.classList.remove('was-validated')
+                newPassword.current?.classList.remove('is-invalid')
+                newPassword.current?.classList.add('is-invalid')
+                setSubmitted(false)
+            } else {
+                form.current?.classList.remove('was-validated')
+                setSubmitted(true)
+            }
+
         }
     }
 
@@ -112,7 +120,8 @@ const EditProfile = () => {
                 ...(firstName.current?.value !== userDetails?.firstName && { firstName: firstName.current?.value }),
                 ...(lastName.current?.value !== userDetails?.lastName && { lastName: lastName.current?.value }),
                 ...(email.current?.value !== userDetails?.email && { email: email.current?.value }),
-
+                ...(password.current?.value !== "" && { currentPassword: password.current?.value }),
+                ...(newPassword.current?.value !== "" && { password: newPassword.current?.value }),
             }).then((response) => {
                 navigate('/profile', { replace: true })
             }, (err) => {
@@ -126,23 +135,35 @@ const EditProfile = () => {
 
                 switch (err.response.status) {
                     case 401:
-                    case 404:
-                        navigate('/logout', { replace: true })
+                        if ((err.response.statusText as string).includes('currentPassword')) {
+                            password.current?.classList.remove('is-valid')
+                            password.current?.classList.add('is-invalid')
+                            newPassword.current?.classList.remove('is-invalid')
+                            newPassword.current?.classList.remove('is-valid')
+                        } else {
+                            navigate('/logout', { replace: true })
+                        }
                         break
                     case 400:
                         firstName.current?.classList.add(((err.response.statusText as string).includes('data/firstName')) ? 'is-invalid' : 'is-valid')
                         lastName.current?.classList.add(((err.response.statusText as string).includes('data/lastName')) ? 'is-invalid' : 'is-valid')
                         email.current?.classList.add(((err.response.statusText as string).includes('data/email')) ? 'is-invalid' : 'is-valid')
                         setEmailError('Please enter a valid email')
-
+                        password.current?.classList.add(((err.response.statusText as string).includes('currentPassword')) ? 'is-invalid' : 'is-valid')
+                        newPassword.current?.classList.add(((err.response.statusText as string).includes('data/password')) ? 'is-invalid' : 'is-valid')
                         break;
                     case 403:
                         if ((err.response.statusText as string).toLowerCase().includes('exists')) { //TODO: Morgan API does not check for this??
                             email.current?.classList.add('is-invalid')
                             setEmailError('Email already in use')
+                        } else if ((err.response.statusText as string).toLowerCase().includes('same')) {
+                            newPassword.current?.classList.add('is-invalid')
                         } else {
                             navigate('/logout', { replace: true })
                         }
+                        break
+                    case 404:
+                        navigate('/logout', { replace: true })
                         break
                     default:
                         setErrorFlag(true)
@@ -191,6 +212,16 @@ const EditProfile = () => {
 
     const toggleExpanded = () => {
         setExpanded(document.getElementById('changePasswordToggle')?.ariaExpanded === 'true');
+    }
+
+    const passwordsMatch = () => {
+        if (password?.current?.value && newPassword.current?.value) {
+            if (password?.current?.value === newPassword.current?.value) {
+                newPassword.current?.classList.add('is-invalid')
+            } else {
+                newPassword.current?.classList.remove('is-invalid')
+            }
+        }
     }
 
     return (
@@ -264,13 +295,13 @@ const EditProfile = () => {
                             </div>
 
                             <div className="d-flex flex-row col-12 input-group mb-3">
-                                <input ref={password} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="editPassword" minLength={6} maxLength={64} />
+                                <input ref={password} onChange={passwordsMatch} type={(passwordVisible) ? 'text' : 'password'} className="form-control" id="editPassword" minLength={6} maxLength={64} />
                                 <button onClick={() => { setPasswordVisible(!passwordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showPassword" ><i className={"bi bi-eye-" + ((!passwordVisible) ? 'slash-' : '') + "fill"}></i></button>
                                 <div className="valid-feedback text-end">
                                     Great!
                                 </div>
                                 <div className="invalid-feedback text-end">
-                                    Password must be between 6-64 characters
+                                    Password must match your current password
                                 </div>
                             </div>
 
@@ -278,13 +309,13 @@ const EditProfile = () => {
                                 <label htmlFor="editPassword" className="form-label">New Password</label>
                             </div>
                             <div className="d-flex flex-row col-12 input-group mb-3">
-                                <input ref={newPassword} type={(newPasswordVisible) ? 'text' : 'password'} className="form-control" id="editNewPassword" minLength={6} maxLength={64} />
+                                <input ref={newPassword} onChange={passwordsMatch} type={(newPasswordVisible) ? 'text' : 'password'} className="form-control" id="editNewPassword" minLength={6} maxLength={64} />
                                 <button onClick={() => { setNewPasswordVisible(!newPasswordVisible) }} className="btn btn-outline-secondary rounded-end" type="button" id="showNewPassword" ><i className={"bi bi-eye-" + ((!newPasswordVisible) ? 'slash-' : '') + "fill"}></i></button>
                                 <div className="valid-feedback text-end">
                                     Great!
                                 </div>
                                 <div className="invalid-feedback text-end">
-                                    Passwords must match
+                                    Required, must be 6-64 characters, and cannot be the same as your current password
                                 </div>
                             </div>
 
