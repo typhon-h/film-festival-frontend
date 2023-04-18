@@ -202,7 +202,7 @@ const Profile = () => {
     if (loading) {
         return (
             <div className="d-flex flex-column">
-                {(timedOut) ? error_timed_out() : ''}
+                {(timedOut && isOnline) ? error_timed_out() : ''}
                 {(errorFlag) ? error_unexpected() : ''}
                 <ProfilePlaceholder />
             </div>
@@ -215,13 +215,13 @@ const Profile = () => {
     console.log(userDetails)
     return (
         <div>
-            {(timedOut) ? error_timed_out() : ''}
+            {(timedOut && isOnline) ? error_timed_out() : ''}
             {(errorFlag) ? error_unexpected() : ''}
 
             <div className="d-flex flex-column align-items-center align-items-sm-center p-4 placeholder-glow">
                 <div className="d-flex flex-row col-12 justify-content-end">
                     <div className='d-flex flex-row'>
-                        <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit</button>
+                        <button className={'btn btn-outline-primary'} onClick={() => { navigate('edit') }}>Edit Profile</button>
                     </div>
                 </div>
                 <div className='d-flex flex-column col-6 align-items-center'>
