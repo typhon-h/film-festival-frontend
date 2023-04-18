@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios"
 import React from "react"
-import { AuthContext } from "../util/Contexts"
+import { AuthContext, OnlineContext } from "../util/Contexts"
 
 
 const login = (email: string | undefined, password: string | undefined, success: ((value: AxiosResponse<any, any>) => AxiosResponse<any, any> | PromiseLike<AxiosResponse<any, any>> | void) | null | undefined, error: ((reason: any) => PromiseLike<never> | void) | null | undefined) => {
@@ -16,6 +16,7 @@ const Login = () => {
     const [, setActiveUser] = React.useContext(AuthContext)
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
     const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
+    const [isOnline] = React.useContext(OnlineContext)
     const [submitted, setSubmitted] = React.useState<boolean>(false)
 
     const form = React.useRef<HTMLFormElement>(null)
@@ -72,7 +73,7 @@ const Login = () => {
 
     return (
         <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100'>
-            {(connectionFlag) ?
+            {(connectionFlag || !isOnline) ?
                 <div className="alert alert-danger" role="alert">
                     Unable to connect to the internet. Please try again
                 </div>

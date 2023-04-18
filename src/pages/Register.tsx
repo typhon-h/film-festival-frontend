@@ -2,7 +2,7 @@ import axios from "axios"
 import React from "react"
 import { useNavigate } from "react-router-dom";
 import { login } from "./Login";
-import { AuthContext } from "../util/Contexts";
+import { AuthContext, OnlineContext } from "../util/Contexts";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -12,6 +12,7 @@ const Register = () => {
     const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false)
     const [errorFlag, setErrorFlag] = React.useState<boolean>(false)
     const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
+    const [isOnline] = React.useContext(OnlineContext)
     const [activeUser, setActiveUser] = React.useContext(AuthContext)
 
     const form = React.useRef<HTMLFormElement>(null)
@@ -162,7 +163,7 @@ const Register = () => {
                 : ''
             }
 
-            {(connectionFlag) ?
+            {(connectionFlag || !isOnline) ?
                 <div className="alert alert-danger" role="alert">
                     Unable to connect to the internet. Please try again
                 </div>
