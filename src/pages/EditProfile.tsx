@@ -153,7 +153,7 @@ const EditProfile = () => {
                         newPassword.current?.classList.add(((err.response.statusText as string).includes('data/password')) ? 'is-invalid' : 'is-valid')
                         break;
                     case 403:
-                        if ((err.response.statusText as string).toLowerCase().includes('exists')) { //TODO: Morgan API does not check for this??
+                        if ((err.response.statusText as string).toLowerCase().includes('already in use')) { //TODO: Morgan API does not check for this??
                             email.current?.classList.add('is-invalid')
                             setEmailError('Email already in use')
                         } else if ((err.response.statusText as string).toLowerCase().includes('same')) {
