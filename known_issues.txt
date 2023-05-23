@@ -11,7 +11,7 @@ Similar Films
    - No message if no similar films -- MORGAN
 
 Register
-   - Email validation not same on front as in api
+   - Email validation not same on front as in api -- MORGAN
 
 Login
    - No error handling if image upload fails (just fails quietly but frontend handles 404s anyway): deciding to ignore
@@ -25,6 +25,6 @@ Reviewing
 
 No handling for 413 image too large -- MORGAN
 
-Check max string length handling
+Check max string length handling: checked register and login, looks fine?
 
 Remove .env
