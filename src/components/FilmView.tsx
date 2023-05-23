@@ -106,7 +106,7 @@ const FilmView = (props: any) => {
                                 result.sort((a, b) => a.rating.toString().localeCompare(b.rating.toString()))
                                 break
                             case 'RATING_DESC':
-                                result.sort((a, b) => a.rating.toString().localeCompare(b.rating.toString()))
+                                result.sort((b, a) => a.rating.toString().localeCompare(b.rating.toString()))
                                 break
                             case 'RELEASED_ASC':
                                 result.sort((a, b) => a.releaseDate.localeCompare(b.releaseDate))
