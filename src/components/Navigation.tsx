@@ -20,14 +20,18 @@ const Navigation = () => {
                     setUserImage(`data: ${response.headers['content-type']}; base64, ${Buffer.from(response.data, 'binary').toString('base64')}`);
                     setUserImageLoaded(true)
                 }, (error) => {
-                    if (error.code !== 'ERR_NETWORK') {
+                    if (error.code !== 'ERR_NETWORK' && !userImageLoaded) {
                         setUserImage(default_profile_picture);
                         setUserImageLoaded(true);
+                        getUserImage();
                     }
                 })
         }
 
-        getUserImage()
+        if (activeUser !== null) {
+            getUserImage()
+        }
+
     }, [activeUser, isOnline])
 
 
