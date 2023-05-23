@@ -1,5 +1,5 @@
 View Films
-    - All results briefly load before search
+    - All results briefly load before search ✓
     - Some pages of results does not scroll to top
     - Film image is not centered on desktop
 

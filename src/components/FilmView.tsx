@@ -38,7 +38,7 @@ const FilmView = (props: any) => {
             }
 
             setIsSearch((searchParams.get('q')) ? true : false)
-            query += (isSearch) ? `&q=${searchParams.get('q')}` : ''
+            query += (searchParams.get('q')) ? `&q=${searchParams.get('q')}` : ''
 
             const ratings = searchParams.getAll('ageRatings')
             if (ratings) {
