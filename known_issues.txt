@@ -30,3 +30,5 @@ Reviewing
 No handling for 413 image too large
 
 Check max string length handling
+
+Remove .env
