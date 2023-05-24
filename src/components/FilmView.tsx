@@ -38,7 +38,7 @@ const FilmView = (props: any) => {
             }
 
             setIsSearch((searchParams.get('q')) ? true : false)
-            query += (isSearch) ? `&q=${searchParams.get('q')}` : ''
+            query += (searchParams.get('q')) ? `&q=${searchParams.get('q')}` : ''
 
             const ratings = searchParams.getAll('ageRatings')
             if (ratings) {
@@ -106,7 +106,7 @@ const FilmView = (props: any) => {
                                 result.sort((a, b) => a.rating.toString().localeCompare(b.rating.toString()))
                                 break
                             case 'RATING_DESC':
-                                result.sort((a, b) => a.rating.toString().localeCompare(b.rating.toString()))
+                                result.sort((b, a) => a.rating.toString().localeCompare(b.rating.toString()))
                                 break
                             case 'RELEASED_ASC':
                                 result.sort((a, b) => a.releaseDate.localeCompare(b.releaseDate))
@@ -128,8 +128,6 @@ const FilmView = (props: any) => {
                     setLoading(false)
                     clearTimeout(timer)
                     setTimedOut(false)
-                    document.documentElement.scrollTop = 0;
-                    document.body.scrollTop = 0;
                 }, (error) => {
                     console.log(error)
 
@@ -146,6 +144,11 @@ const FilmView = (props: any) => {
 
         getFilms()
     }, [isSearch, searchParams, props.placeholder, page, filmState, activeUser])
+
+    React.useEffect(() => {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }, [page])
 
     const list_of_films = () => {
         return films.map((film: Film) =>
@@ -241,7 +244,7 @@ const FilmView = (props: any) => {
                         }}>Reviewed</button></li>
                     </ul>
                 </li>
-            </ul>
+            </ul >
         )
     }
 

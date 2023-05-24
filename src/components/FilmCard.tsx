@@ -43,13 +43,13 @@ const FilmCard = (props: any) => {
 
     return (
         <a href={'/films/' + props.film.filmId} className={'card d-flex flex-column flex-lg-row justify-content-center align-items-lg-center text-decoration-none text-dark mb-3 col-12 ' + (heroImageLoaded ? '' : 'placeholder-glow')}>
-            <div className="d-flex col-12 col-lg-5 img-thumbnail">
+            <div className="d-flex col-12 col-lg-5 img-thumbnail ms-lg-3">
                 <div className={'ratio ratio-1x1 ' + (heroImageLoaded ? '' : 'placeholder')} >
                     <img className={'mx-auto ratio ratio-1x1 ' + (heroImageLoaded ? '' : 'invisible')} src={(heroImageLoaded ? heroImage : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=")} alt="Hero" style={{ boxSizing: 'border-box', objectFit: 'cover' }} />
                 </div>
             </div>
 
-            <div className="card-body d-flex flex-column justify-content-around align-items-center col-lg-7 col-xl-3">
+            <div className="card-body d-flex flex-column justify-content-around align-items-center col-lg-7 col-xl-3 ps-lg-1">
                 <h5 className="card-title display text-break text-center text-capitalize">{props.film.title}</h5>
 
                 <div className="d-flex flex-column flex-md-row justify-content-around p-2 mb-2">

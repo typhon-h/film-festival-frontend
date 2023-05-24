@@ -1,31 +1,30 @@
 View Films
-    - All results briefly load before search
-    - Pagination is not present in URL query - only benefit is under 1 'page' parameter
-    - Some pages of results does not scroll to top
 
  Filter Films
-    - Cannot adjust filter criteria while films loading
+    - Cannot adjust filter criteria while films loading: could not replicate issue
 
 View Film
-   - Cannot see date on reviews to verify sort
-   - Genre sometimes does not load (check dependencies)
+   - Cannot see date on reviews to verify sort -- MORGAN
+   - Genre sometimes does not load (check dependencies): deciding to ignore
 
 Similar Films
-   - No message if no similar films
+   - No message if no similar films -- MORGAN
 
 Register
-   - Email validation not same on front as in api
+   - Email validation not same on front as in api -- MORGAN
 
 Login
-   - No error handling if image upload fails (just fails quietly but frontend handles 404s anyway)
+   - No error handling if image upload fails (just fails quietly but frontend handles 404s anyway): deciding to ignore
 
 Create
-   - Image upload error is ignored (404 error is handled)
+   - Image upload error is ignored (404 error is handled): deciding to ignore
 
 Reviewing
-   - Allows reviews on the day of release (this is not in the past)
+   - Allows reviews on the day of release (this is not in the past) -- MORGAN
 
 
-No handling for 413 image too large
+No handling for 413 image too large -- MORGAN
 
-Check max string length handling
+Check max string length handling: checked register and login, looks fine?
+
+Remove .env
