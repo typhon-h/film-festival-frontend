@@ -218,7 +218,12 @@ const ReviewsPanel = (props: any) => {
         return (
             <div className="d-flex flex-column col-12">
                 <button onClick={toggleExpanded} className='d-flex flex-row bg-light border justify-content-between align-items-center py-2 px-3 rounded-top text-reset text-decoration-none' data-bs-toggle="collapse" data-bs-target="#userReviews" aria-expanded="false" aria-controls="userReviews" id='reviewPanel'>
-                    <span className='fs-3'> <i className={'bi bi-caret-' + ((expanded) ? 'down' : 'right')}></i> User Reviews</span>
+                    <div className='d-flex flex-column'>
+                        <span className='fs-3'> <i className={'bi bi-caret-' + ((expanded) ? 'down' : 'right')}></i> User Reviews</span>
+                        <span className='fs-6 text-muted fst-italic align-self-end mx-auto'>(click to expand)</span>
+
+                    </div>
+
                     <div className='d-flex flex-column'>
                         {(props.rating) ?
                             <span className='fs-6 fw-light'><span className={'fs-3 fw-semibold pe-1 ' + ((props.rating >= 5) ? 'text-success' : 'text-danger')}>{props.rating}</span>/ 10</span>
@@ -228,7 +233,9 @@ const ReviewsPanel = (props: any) => {
 
                         <span className='text-muted fs-6'>{reviews.length} review{(reviews.length !== 1) ? 's' : ''}</span>
                     </div>
+
                 </button>
+
 
                 <div className='collapse' id='userReviews'>
                     <div className='d-flex flex-column col-12 border'>
