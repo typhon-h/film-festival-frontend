@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios"
 import React from "react"
 import { AuthContext, OnlineContext } from "../util/Contexts"
+import { useNavigate } from "react-router-dom"
 
 
 const login = (email: string | undefined, password: string | undefined, success: ((value: AxiosResponse<any, any>) => AxiosResponse<any, any> | PromiseLike<AxiosResponse<any, any>> | void) | null | undefined, error: ((reason: any) => PromiseLike<never> | void) | null | undefined) => {
@@ -18,6 +19,7 @@ const Login = () => {
     const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
     const [isOnline] = React.useContext(OnlineContext)
     const [submitted, setSubmitted] = React.useState<boolean>(false)
+    const navigate = useNavigate();
 
     const form = React.useRef<HTMLFormElement>(null)
     const email = React.useRef<HTMLInputElement>(null)
@@ -57,6 +59,7 @@ const Login = () => {
                 }
                 localStorage.setItem('activeUser', response.data.userId)
                 localStorage.setItem('token', response.data.token)
+                navigate("/films");
             }, (err) => {
                 console.log(err)
                 setSubmitted(false)
