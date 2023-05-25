@@ -72,7 +72,7 @@ const Login = () => {
                 }
             })
 
-    }, [setActiveUser, submitted])
+    }, [navigate, setActiveUser, submitted])
 
     return (
         <div className='d-flex flex-column col-12 p-3 align-items-center justify-content-center h-100'>

@@ -14,6 +14,7 @@ const Register = () => {
     const [connectionFlag, setConnectionFlag] = React.useState<boolean>(false)
     const [isOnline] = React.useContext(OnlineContext)
     const [activeUser, setActiveUser] = React.useContext(AuthContext)
+    const [user, setUser] = React.useState<number>(0);
 
     const form = React.useRef<HTMLFormElement>(null)
     const firstName = React.useRef<HTMLInputElement>(null)
@@ -71,7 +72,7 @@ const Register = () => {
             ).then((response) => {
                 login(email.current?.value as string, password.current?.value as string,
                     (response) => {
-                        setActiveUser(response.data.userId)
+                        setUser(response.data.userId)
                         axios.defaults.headers.common = {
                             'x-authorization': response.data.token
                         }
@@ -132,7 +133,7 @@ const Register = () => {
     }, [submitted, newUserImage, setActiveUser, navigate])
 
     React.useEffect(() => {
-        if (!submitted || activeUser === null) {
+        if (!submitted || !user) {
             return
         }
         const postImage = (id: number) => {
@@ -143,6 +144,7 @@ const Register = () => {
                 }
             })
                 .then((response) => {
+                    setActiveUser(user)
                     navigate('/films')
                 }, (err) => { //TODO: Redirect user profile
                     console.log(err)
@@ -150,9 +152,9 @@ const Register = () => {
                 })
         }
 
-        postImage(activeUser)
+        postImage(user)
 
-    }, [activeUser, navigate, newUserImage, submitted])
+    }, [user, navigate, newUserImage, setActiveUser, submitted, activeUser])
 
     return (
         <div>

@@ -23,16 +23,15 @@ const Navigation = () => {
                     if (error.code !== 'ERR_NETWORK' && !userImageLoaded) {
                         setUserImage(default_profile_picture);
                         setUserImageLoaded(true);
-                        getUserImage();
                     }
                 })
         }
 
-        if (activeUser !== null) {
+        if (activeUser !== null && !userImageLoaded) {
             getUserImage()
         }
 
-    }, [activeUser, isOnline])
+    }, [activeUser, isOnline, userImageLoaded])
 
 
     return (

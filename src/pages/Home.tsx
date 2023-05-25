@@ -1,10 +1,6 @@
-import React from "react"
 import Restricted from "../layouts/Restricted"
-import { AuthContext } from "../util/Contexts"
 
 const Home = () => {
-    const [ActiveUser,] = React.useContext(AuthContext)
-
 
     return (
         <div className="d-flex flex-column justify-content-center align-items-center position-absolute bottom-50 start-50 translate-middle-x">
