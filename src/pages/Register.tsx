@@ -143,10 +143,10 @@ const Register = () => {
                 }
             })
                 .then((response) => {
-                    navigate('/')
+                    navigate('/films')
                 }, (err) => { //TODO: Redirect user profile
                     console.log(err)
-                    navigate('/')
+                    navigate('/films')
                 })
         }
 
