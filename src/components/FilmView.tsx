@@ -193,7 +193,7 @@ const FilmView = (props: any) => {
         return (
             <div className="my-1">
                 <h1 className="text-muted">
-                    All Films
+                    Films
                 </h1>
             </div>
         )
@@ -216,7 +216,7 @@ const FilmView = (props: any) => {
         }
 
         return (
-            <ul className="nav nav-tabs nav-fill mb-3">
+            <ul className="nav nav-tabs nav-fill mb-3  fs-5">
                 <li className="nav-item">
                     <button className={"nav-link " + ((filmState === 'allFilms') ? 'active' : '')} onClick={() => {
                         document.getElementById('myFilmsDropdownMenu')?.classList.remove('show');
