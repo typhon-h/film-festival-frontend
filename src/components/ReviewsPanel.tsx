@@ -238,7 +238,7 @@ const ReviewsPanel = (props: any) => {
 
 
                 <div className='collapse' id='userReviews'>
-                    <div className='d-flex flex-column col-12 border'>
+                    <div className='d-flex flex-column col-12 border overflow-auto' style={{ maxHeight: "50vh" }}>
                         {render_reviews()}
                     </div>
                 </div>
